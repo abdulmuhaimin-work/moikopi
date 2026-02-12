@@ -47,11 +47,13 @@ func _process(_delta: float) -> void:
 	var h := int(GameManager.max_height)
 	height_label.text = "%dm" % h
 
-	# Best finish time
+	# Best records
+	var parts: Array[String] = []
+	if GameManager.best_height > 0.0:
+		parts.append("Peak: %dm" % int(GameManager.best_height))
 	if GameManager.best_finish_time >= 0.0:
-		best_label.text = "Best: %s" % GameManager.get_time_string(GameManager.best_finish_time)
-	else:
-		best_label.text = ""
+		parts.append("Best: %s" % GameManager.get_time_string(GameManager.best_finish_time))
+	best_label.text = " | ".join(parts)
 
 	# Power bar
 	power_bar_bg.visible = GameManager.is_charging

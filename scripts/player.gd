@@ -87,6 +87,7 @@ func _physics_process(delta: float) -> void:
 			var normal := collision.get_normal()
 			if abs(normal.x) > 0.7:
 				velocity.x = -pre_velocity.x * WALL_BOUNCE
+				GameManager.add_wall_bounce()
 				break
 
 	# Landing
@@ -154,6 +155,7 @@ func _process_charging(delta: float) -> void:
 		velocity.x = current_power * cos(current_angle)
 		velocity.y = -current_power * sin(current_angle)
 		state = State.AIRBORNE
+		GameManager.add_jump()
 		aim_arrow.visible = false
 		sprite.play("jump")
 		GameManager.is_charging = false
