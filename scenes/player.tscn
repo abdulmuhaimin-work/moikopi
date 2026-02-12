@@ -1,7 +1,7 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene format=3 uid="uid://bp8n8wgjiivya"]
 
 [ext_resource type="Texture2D" uid="uid://dkgwueyp2bkyt" path="res://assets/Raora-sprite-sheet.png" id="1_sprite"]
-[ext_resource type="Script" path="res://scripts/player.gd" id="2_script"]
+[ext_resource type="Script" uid="uid://ck6ortt0lyrhs" path="res://scripts/player.gd" id="2_script"]
 
 [sub_resource type="AtlasTexture" id="atlas_idle_0"]
 atlas = ExtResource("1_sprite")
@@ -61,27 +61,25 @@ animations = [{
 [sub_resource type="RectangleShape2D" id="collision_rect"]
 size = Vector2(16, 24)
 
-[node name="Player" type="CharacterBody2D"]
+[node name="Player" type="CharacterBody2D" unique_id=392758256]
 floor_snap_length = 2.0
 script = ExtResource("2_script")
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1997439719]
 scale = Vector2(0.1, 0.1)
 sprite_frames = SubResource("sprite_frames")
-animation = &"default"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1191878921]
 shape = SubResource("collision_rect")
 
-[node name="AimArrow" type="Line2D" parent="."]
+[node name="AimArrow" type="Line2D" parent="." unique_id=1257178432]
 points = PackedVector2Array(0, 0, 30, 0)
 width = 1.5
 default_color = Color(1, 0.8, 0.3, 0.9)
 
-[node name="Camera2D" type="Camera2D" parent="."]
+[node name="Camera2D" type="Camera2D" parent="." unique_id=272221252]
 position = Vector2(0, -30)
-position_smoothing_enabled = true
-position_smoothing_speed = 5.0
 limit_left = -40
 limit_right = 360
 limit_bottom = 200
+position_smoothing_enabled = true

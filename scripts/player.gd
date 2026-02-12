@@ -13,10 +13,10 @@ const CHARGE_RATE := 200.0
 # Oscillation ranges per direction (from horizontal)
 # Right: 45° (more sideways) to 85° (nearly vertical)
 # Left:  95° (nearly vertical) to 135° (more sideways)
-const ANGLE_RIGHT_MIN := deg_to_rad(45.0)
+const ANGLE_RIGHT_MIN := deg_to_rad(35.0)
 const ANGLE_RIGHT_MAX := deg_to_rad(85.0)
-const ANGLE_LEFT_MIN := deg_to_rad(95.0)
-const ANGLE_LEFT_MAX := deg_to_rad(135.0)
+const ANGLE_LEFT_MIN := deg_to_rad(145.0)
+const ANGLE_LEFT_MAX := deg_to_rad(195.0)
 const ANGLE_SPEED := 3.5
 
 # Visual
@@ -130,7 +130,7 @@ func _process_charging(delta: float) -> void:
 	if charging_dir > 0:
 		current_angle = ANGLE_RIGHT_MIN + osc * (ANGLE_RIGHT_MAX - ANGLE_RIGHT_MIN)
 	else:
-		current_angle = ANGLE_LEFT_MIN + osc * (ANGLE_LEFT_MAX - ANGLE_LEFT_MIN)
+		current_angle = ANGLE_LEFT_MIN + osc * (ANGLE_LEFT_MIN - ANGLE_LEFT_MAX)
 
 	var power_ratio := (current_power - MIN_POWER) / (MAX_POWER - MIN_POWER)
 
