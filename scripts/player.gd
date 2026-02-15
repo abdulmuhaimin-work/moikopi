@@ -88,12 +88,14 @@ func _physics_process(delta: float) -> void:
 			if abs(normal.x) > 0.7:
 				velocity.x = -pre_velocity.x * WALL_BOUNCE
 				GameManager.add_wall_bounce()
+				AudioManager.play_bounce()
 				break
 
 	# Landing
 	if state == State.AIRBORNE and is_on_floor():
 		velocity = Vector2.ZERO
 		state = State.IDLE
+		AudioManager.play_land()
 		GameManager.update_height(global_position.y)
 
 	# Clear input flags
@@ -107,8 +109,7 @@ func _process_idle() -> void:
 	GameManager.is_charging = false
 	GameManager.charge_percent = 0.0
 
-	if GameManager.game_state == GameManager.GameState.FINISHED \
-		or GameManager.game_state == GameManager.GameState.FAILED:
+	if GameManager.game_state == GameManager.GameState.FAILED:
 		return
 
 	if is_on_floor() and _jump_dir != 0:
@@ -156,6 +157,7 @@ func _process_charging(delta: float) -> void:
 		velocity.y = -current_power * sin(current_angle)
 		state = State.AIRBORNE
 		GameManager.add_jump()
+		AudioManager.play_jump()
 		aim_arrow.visible = false
 		sprite.play("jump")
 		GameManager.is_charging = false

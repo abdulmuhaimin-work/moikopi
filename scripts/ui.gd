@@ -6,32 +6,31 @@ extends CanvasLayer
 @onready var restart_hint: Label = $RestartHint
 @onready var power_bar_bg: ColorRect = $PowerBarBg
 @onready var power_bar_fill: ColorRect = $PowerBarBg/PowerBarFill
-@onready var finish_panel: PanelContainer = $FinishPanel
-@onready var finish_time_label: Label = $FinishPanel/VBox/FinishTimeLabel
-@onready var finish_best_label: Label = $FinishPanel/VBox/FinishBestLabel
+@onready var goal_toast: Label = $GoalToast
 @onready var fail_panel: PanelContainer = $FailPanel
 @onready var fail_height_label: Label = $FailPanel/VBox/FailHeightLabel
 @onready var btn_restart: Button = $BtnRestart
 @onready var btn_menu: Button = $BtnMenu
-@onready var finish_btn_retry: Button = $FinishPanel/VBox/HBox/FinishBtnRetry
-@onready var finish_btn_menu: Button = $FinishPanel/VBox/HBox/FinishBtnMenu
 @onready var fail_btn_retry: Button = $FailPanel/VBox/HBox/FailBtnRetry
 @onready var fail_btn_menu: Button = $FailPanel/VBox/HBox/FailBtnMenu
 
 var _is_mobile := false
+var _toast_time_left: float = 0.0
+
+const TOAST_DURATION := 3.5  # seconds the goal toast stays visible
 
 
 func _ready() -> void:
-	finish_panel.visible = false
 	fail_panel.visible = false
+	goal_toast.visible = false
 	_is_mobile = DisplayServer.is_touchscreen_available()
 
 	btn_restart.pressed.connect(_on_restart)
 	btn_menu.pressed.connect(_on_menu)
-	finish_btn_retry.pressed.connect(_on_restart)
-	finish_btn_menu.pressed.connect(_on_menu)
 	fail_btn_retry.pressed.connect(_on_restart)
 	fail_btn_menu.pressed.connect(_on_menu)
+
+	GameManager.goal_reached.connect(_on_goal_reached)
 
 	if _is_mobile:
 		restart_hint.text = "Left = jump left | Right = jump right"
@@ -39,7 +38,15 @@ func _ready() -> void:
 		restart_hint.text = "A/D jump | R restart | Esc menu"
 
 
-func _process(_delta: float) -> void:
+func _on_goal_reached(time_str: String) -> void:
+	goal_toast.text = "GOAL!  %s" % time_str
+	goal_toast.visible = true
+	goal_toast.modulate.a = 1.0
+	_toast_time_left = TOAST_DURATION
+	AudioManager.play_goal()
+
+
+func _process(delta: float) -> void:
 	# Timer
 	timer_label.text = GameManager.get_time_string()
 
@@ -60,19 +67,20 @@ func _process(_delta: float) -> void:
 	if GameManager.is_charging:
 		power_bar_fill.size.x = 60.0 * GameManager.charge_percent
 
-	# Finish overlay
-	if GameManager.game_state == GameManager.GameState.FINISHED and not finish_panel.visible:
-		finish_panel.visible = true
-		finish_time_label.text = GameManager.get_time_string()
-		if GameManager.best_finish_time >= 0.0:
-			finish_best_label.text = "Best: %s" % GameManager.get_time_string(GameManager.best_finish_time)
-		else:
-			finish_best_label.text = ""
+	# Goal toast fade-out
+	if _toast_time_left > 0.0:
+		_toast_time_left -= delta
+		if _toast_time_left <= 1.0:
+			goal_toast.modulate.a = maxf(_toast_time_left, 0.0)
+		if _toast_time_left <= 0.0:
+			goal_toast.visible = false
 
 	# Fail overlay
 	if GameManager.game_state == GameManager.GameState.FAILED and not fail_panel.visible:
 		fail_panel.visible = true
 		fail_height_label.text = "Reached: %dm" % int(GameManager.max_height)
+		AudioManager.play_fall()
+		AudioManager.stop_bgm()
 
 
 func _input(_event: InputEvent) -> void:

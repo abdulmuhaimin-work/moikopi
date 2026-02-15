@@ -76,62 +76,16 @@ offset_right = 0
 offset_bottom = 5
 color = Color(1, 0.4, 0.1, 0.9)
 
-[node name="FinishPanel" type="PanelContainer" parent="."]
+[node name="GoalToast" type="Label" parent="."]
 visible = false
 offset_left = 60
-offset_top = 30
+offset_top = 40
 offset_right = 260
-offset_bottom = 150
-
-[node name="VBox" type="VBoxContainer" parent="FinishPanel"]
-offset_left = 4
-offset_top = 4
-offset_right = 196
-offset_bottom = 116
-alignment = 1
-
-[node name="FinishTitle" type="Label" parent="FinishPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 12
+offset_bottom = 58
+theme_override_font_sizes/font_size = 11
 theme_override_colors/font_color = Color(0.95, 0.8, 0.2, 1)
 horizontal_alignment = 1
-text = "FINISHED!"
-
-[node name="FinishTimeLabel" type="Label" parent="FinishPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 8
-horizontal_alignment = 1
-text = "00:00.000"
-
-[node name="FinishBestLabel" type="Label" parent="FinishPanel/VBox"]
-layout_mode = 2
-theme_override_font_sizes/font_size = 7
-horizontal_alignment = 1
 text = ""
-
-[node name="Spacer" type="Control" parent="FinishPanel/VBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 4)
-
-[node name="HBox" type="HBoxContainer" parent="FinishPanel/VBox"]
-layout_mode = 2
-alignment = 1
-
-[node name="FinishBtnRetry" type="Button" parent="FinishPanel/VBox/HBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(60, 16)
-theme_override_font_sizes/font_size = 7
-text = "Retry"
-
-[node name="Spacer" type="Control" parent="FinishPanel/VBox/HBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(10, 0)
-
-[node name="FinishBtnMenu" type="Button" parent="FinishPanel/VBox/HBox"]
-layout_mode = 2
-custom_minimum_size = Vector2(60, 16)
-theme_override_font_sizes/font_size = 7
-text = "Menu"
 
 [node name="FailPanel" type="PanelContainer" parent="."]
 visible = false

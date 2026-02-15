@@ -1,6 +1,8 @@
 extends Node
 
-enum GameState { NOT_STARTED, RUNNING, FINISHED, FAILED }
+signal goal_reached(time_str: String)
+
+enum GameState { NOT_STARTED, RUNNING, ENDLESS, FAILED }
 
 var game_state: GameState = GameState.NOT_STARTED
 var elapsed_time: float = 0.0
@@ -37,7 +39,7 @@ func _ready() -> void:
 
 
 func _process(delta: float) -> void:
-	if game_state == GameState.RUNNING:
+	if game_state == GameState.RUNNING or game_state == GameState.ENDLESS:
 		elapsed_time += delta
 		stats["total_play_time"] += delta
 
@@ -70,17 +72,17 @@ func update_height(player_y: float) -> void:
 				best_times[milestone] = elapsed_time
 				save_data()
 
-	# Check finish
+	# Check finish (first time crossing the goal – transition to ENDLESS)
 	if game_state == GameState.RUNNING and player_y <= finish_y:
-		game_state = GameState.FINISHED
+		game_state = GameState.ENDLESS
 		stats["total_finishes"] += 1
-		stats["total_height"] += max_height
 		if best_finish_time < 0.0 or elapsed_time < best_finish_time:
 			best_finish_time = elapsed_time
 		save_data()
+		goal_reached.emit(get_time_string())
 
-	# Check death
-	if game_state == GameState.RUNNING and player_y > death_y:
+	# Check death (applies in both RUNNING and ENDLESS)
+	if (game_state == GameState.RUNNING or game_state == GameState.ENDLESS) and player_y > death_y:
 		game_state = GameState.FAILED
 		stats["total_falls"] += 1
 		stats["total_height"] += max_height
@@ -88,8 +90,8 @@ func update_height(player_y: float) -> void:
 
 
 func restart() -> void:
-	# Accumulate height from unfinished run (not finished or failed yet)
-	if game_state == GameState.RUNNING:
+	# Accumulate height from ongoing run (RUNNING or ENDLESS)
+	if game_state == GameState.RUNNING or game_state == GameState.ENDLESS:
 		stats["total_height"] += max_height
 		save_data()
 	game_state = GameState.NOT_STARTED
@@ -101,9 +103,10 @@ func restart() -> void:
 
 
 func go_to_menu() -> void:
-	if game_state == GameState.RUNNING:
+	if game_state == GameState.RUNNING or game_state == GameState.ENDLESS:
 		stats["total_height"] += max_height
 		save_data()
+	AudioManager.stop_bgm()
 	game_state = GameState.NOT_STARTED
 	elapsed_time = 0.0
 	max_height = 0.0

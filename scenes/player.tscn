@@ -1,31 +1,39 @@
 [gd_scene format=3 uid="uid://bp8n8wgjiivya"]
 
-[ext_resource type="Texture2D" uid="uid://dkgwueyp2bkyt" path="res://assets/Raora-sprite-sheet.png" id="1_sprite"]
+[ext_resource type="Texture2D" path="res://assets/frog-sprite-sheet.png" id="1_sprite"]
 [ext_resource type="Script" uid="uid://ck6ortt0lyrhs" path="res://scripts/player.gd" id="2_script"]
 
 [sub_resource type="AtlasTexture" id="atlas_idle_0"]
 atlas = ExtResource("1_sprite")
-region = Rect2(0, 0, 209, 258)
+region = Rect2(0, 0, 704, 768)
 
 [sub_resource type="AtlasTexture" id="atlas_idle_1"]
 atlas = ExtResource("1_sprite")
-region = Rect2(209, 0, 209, 258)
+region = Rect2(704, 0, 704, 768)
 
 [sub_resource type="AtlasTexture" id="atlas_idle_2"]
 atlas = ExtResource("1_sprite")
-region = Rect2(418, 0, 209, 258)
+region = Rect2(1408, 0, 704, 768)
 
 [sub_resource type="AtlasTexture" id="atlas_idle_3"]
 atlas = ExtResource("1_sprite")
-region = Rect2(627, 0, 209, 258)
+region = Rect2(2112, 0, 704, 768)
 
 [sub_resource type="AtlasTexture" id="atlas_jump_0"]
 atlas = ExtResource("1_sprite")
-region = Rect2(418, 0, 209, 258)
+region = Rect2(0, 768, 704, 768)
 
 [sub_resource type="AtlasTexture" id="atlas_jump_1"]
 atlas = ExtResource("1_sprite")
-region = Rect2(627, 0, 209, 258)
+region = Rect2(704, 768, 704, 768)
+
+[sub_resource type="AtlasTexture" id="atlas_jump_2"]
+atlas = ExtResource("1_sprite")
+region = Rect2(1408, 768, 704, 768)
+
+[sub_resource type="AtlasTexture" id="atlas_jump_3"]
+atlas = ExtResource("1_sprite")
+region = Rect2(2112, 768, 704, 768)
 
 [sub_resource type="SpriteFrames" id="sprite_frames"]
 animations = [{
@@ -44,7 +52,7 @@ animations = [{
 }],
 "loop": true,
 "name": &"default",
-"speed": 5.0
+"speed": 4.0
 }, {
 "frames": [{
 "duration": 1.0,
@@ -52,22 +60,29 @@ animations = [{
 }, {
 "duration": 1.0,
 "texture": SubResource("atlas_jump_1")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_jump_2")
+}, {
+"duration": 1.0,
+"texture": SubResource("atlas_jump_3")
 }],
 "loop": false,
 "name": &"jump",
-"speed": 5.0
+"speed": 8.0
 }]
 
 [sub_resource type="RectangleShape2D" id="collision_rect"]
-size = Vector2(16, 24)
+size = Vector2(18, 22)
 
 [node name="Player" type="CharacterBody2D" unique_id=392758256]
 floor_snap_length = 2.0
 script = ExtResource("2_script")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="." unique_id=1997439719]
-scale = Vector2(0.1, 0.1)
+scale = Vector2(0.035, 0.035)
 sprite_frames = SubResource("sprite_frames")
+animation = &"default"
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1191878921]
 shape = SubResource("collision_rect")
