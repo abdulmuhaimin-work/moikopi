@@ -78,17 +78,17 @@ var platforms: Array = [
 	[50, -70, 150, 12],
 ]
 
-# Hand-crafted level colors
-var platform_color := Color(0.35, 0.55, 0.35)
-var platform_alt := Color(0.30, 0.50, 0.38)
-var rest_color := Color(0.40, 0.55, 0.50)
-var finish_color := Color(0.95, 0.80, 0.20)
-var ground_color := Color(0.25, 0.38, 0.25)
+# Hand-crafted level colors (warm forest palette)
+var platform_color := Color(0.30, 0.42, 0.22)
+var platform_alt := Color(0.26, 0.38, 0.20)
+var rest_color := Color(0.40, 0.32, 0.22)
+var finish_color := Color(0.85, 0.65, 0.20)
+var ground_color := Color(0.28, 0.22, 0.15)
 
-# Endless section colors (cooler blue/purple tones)
-var endless_color_a := Color(0.30, 0.38, 0.55)
-var endless_color_b := Color(0.35, 0.33, 0.50)
-var endless_rest := Color(0.38, 0.42, 0.55)
+# Endless section colors (deeper forest tones)
+var endless_color_a := Color(0.22, 0.35, 0.20)
+var endless_color_b := Color(0.25, 0.30, 0.18)
+var endless_rest := Color(0.35, 0.30, 0.20)
 
 const DEATH_Y := 220.0  # Below the starting platform
 const VIEWPORT_WIDTH := 320.0
@@ -163,6 +163,9 @@ func _ready() -> void:
 	_prev_x = goal_plat[0]
 	_prev_w = goal_plat[2]
 	_prev_y = finish_y
+
+	# Floating leaf particles (attached to camera so they stay in view)
+	call_deferred("_create_leaf_particles")
 
 	# Start background music
 	AudioManager.play_bgm()
@@ -327,14 +330,14 @@ func _create_platform(x: float, y: float, w: float, h: float, color: Color) -> v
 	add_child(body)
 
 
-func _create_rest_walls(plat_x: float, plat_y: float, plat_w: float) -> void:
+func _create_rest_walls(_plat_x: float, plat_y: float, _plat_w: float) -> void:
 	# Visible bounce walls at the viewport edges near rest platforms.
 	# They span from below the rest platform to slightly above it,
 	# letting the player bounce off the walls and redirect onto the platform.
 	var wall_w := 6.0
 	var wall_h := 90.0
 	var wall_top := plat_y - 10.0   # Slightly above the rest platform
-	var wall_color := Color(0.50, 0.55, 0.65, 0.85)
+	var wall_color := Color(0.38, 0.30, 0.22, 0.85)
 
 	# Left wall at the left viewport edge
 	_create_platform(0.0, wall_top, wall_w, wall_h, wall_color)
@@ -342,12 +345,53 @@ func _create_rest_walls(plat_x: float, plat_y: float, plat_w: float) -> void:
 	_create_platform(VIEWPORT_WIDTH - wall_w, wall_top, wall_w, wall_h, wall_color)
 
 
+func _create_leaf_particles() -> void:
+	var player := get_node_or_null("../Player")
+	if player == null:
+		return
+	var cam := player.get_node_or_null("Camera2D")
+	if cam == null:
+		return
+
+	var leaves := CPUParticles2D.new()
+	leaves.emitting = true
+	leaves.amount = 20
+	leaves.lifetime = 10.0
+	leaves.speed_scale = 0.6
+	leaves.explosiveness = 0.0
+
+	# Emission: wide box above the camera view
+	leaves.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	leaves.emission_rect_extents = Vector2(200, 10)
+	leaves.position = Vector2(0, -110)
+
+	# Movement: gentle drift downward with slight horizontal sway
+	leaves.direction = Vector2(0, 1)
+	leaves.spread = 30.0
+	leaves.initial_velocity_min = 5.0
+	leaves.initial_velocity_max = 12.0
+	leaves.gravity = Vector2(0, 4)
+
+	# Appearance: tiny squares that fade
+	leaves.scale_amount_min = 1.0
+	leaves.scale_amount_max = 2.5
+
+	# Warm forest leaf colours (yellow-green to brown)
+	leaves.color = Color(0.55, 0.50, 0.25, 0.35)
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0.50, 0.55, 0.25, 0.4))
+	grad.set_color(1, Color(0.45, 0.35, 0.18, 0.0))
+	leaves.color_ramp = grad
+
+	cam.add_child(leaves)
+
+
 func _create_finish_label(finish_y: float) -> void:
 	var label := Label.new()
 	label.text = "GOAL"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 10)
-	label.add_theme_color_override("font_color", Color(0.95, 0.80, 0.20))
+	label.add_theme_color_override("font_color", Color(0.85, 0.65, 0.20))
 	label.position = Vector2(120, finish_y - 20)
 	label.size = Vector2(80, 16)
 	add_child(label)
@@ -358,7 +402,7 @@ func _create_beyond_label(finish_y: float) -> void:
 	label.text = "~ ENDLESS ~"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 7)
-	label.add_theme_color_override("font_color", Color(0.55, 0.60, 0.80, 0.7))
+	label.add_theme_color_override("font_color", Color(0.55, 0.65, 0.40, 0.7))
 	label.position = Vector2(100, finish_y - 50)
 	label.size = Vector2(120, 12)
 	add_child(label)

@@ -74,7 +74,7 @@ offset_left = 0
 offset_top = 0
 offset_right = 0
 offset_bottom = 5
-color = Color(1, 0.4, 0.1, 0.9)
+color = Color(0.80, 0.50, 0.15, 0.9)
 
 [node name="GoalToast" type="Label" parent="."]
 visible = false
@@ -83,7 +83,7 @@ offset_top = 40
 offset_right = 260
 offset_bottom = 58
 theme_override_font_sizes/font_size = 11
-theme_override_colors/font_color = Color(0.95, 0.8, 0.2, 1)
+theme_override_colors/font_color = Color(0.85, 0.65, 0.2, 1)
 horizontal_alignment = 1
 text = ""
 
