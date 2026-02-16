@@ -1,32 +1,42 @@
 extends Node2D
 
-## Forest background: vertical gradient + parallax tree silhouettes.
-## Attach as first child in main scene so it renders behind everything.
+## Forest background: layered parallax textures with weather-responsive sky.
+## Computes rain_factor from player height so other systems (rain, audio) can read it.
 
 const VIEWPORT_W := 320.0
 const VIEWPORT_H := 180.0
 
-# Gradient colours (bottom → top)
-const COLOR_BOTTOM := Color(0.06, 0.08, 0.05, 1.0)  # Dark forest floor
-const COLOR_TOP := Color(0.12, 0.18, 0.10, 1.0)      # Slightly lighter canopy
+# Sky gradient colours
+const SKY_RAIN_TOP := Color(0.05, 0.07, 0.12, 1.0)
+const SKY_RAIN_BOT := Color(0.04, 0.05, 0.08, 1.0)
+const SKY_CLEAR_TOP := Color(0.10, 0.16, 0.09, 1.0)
+const SKY_CLEAR_BOT := Color(0.06, 0.08, 0.05, 1.0)
 
-# Tree silhouette layers (parallax_factor, colour, width_range, count)
-var _tree_layers: Array = [
-	{ "parallax": 0.15, "color": Color(0.07, 0.10, 0.06, 0.6), "w_min": 12.0, "w_max": 22.0, "count": 6 },
-	{ "parallax": 0.25, "color": Color(0.09, 0.13, 0.07, 0.45), "w_min": 8.0, "w_max": 16.0, "count": 8 },
-	{ "parallax": 0.35, "color": Color(0.11, 0.15, 0.09, 0.3), "w_min": 5.0, "w_max": 12.0, "count": 10 },
+# Rain thresholds (height in meters / pixels)
+const RAIN_FULL_HEIGHT := 1000.0
+const RAIN_FADE_RANGE := 200.0
+
+# Layer textures (loaded at runtime so Godot import can happen first)
+var _tex_far: Texture2D = null
+var _tex_mid: Texture2D = null
+var _tex_near: Texture2D = null
+
+# Parallax settings per layer: [parallax_factor, draw_alpha]
+# Lower parallax = further away = scrolls slower
+var _layer_settings: Array = [
+	[0.10, 1.0],    # Far: very slow, fully opaque (base layer)
+	[0.25, 0.75],   # Mid: moderate, semi-transparent for depth blending
+	[0.45, 1.0],    # Near: faster, full opacity (image has alpha channel)
 ]
 
-# Precomputed tree positions per layer: Array of Array of {x, w, h}
-var _trees: Array = []
-
 var _camera: Camera2D = null
+var rain_factor: float = 1.0  # 1.0 = full rain, 0.0 = clear sky
 
 
 func _ready() -> void:
-	# The gradient is drawn as a full-screen rect that follows the camera,
-	# tinted via _draw() override.
-	_seed_trees()
+	_tex_far = load("res://assets/bg/bg_far.png")
+	_tex_mid = load("res://assets/bg/bg_mid.png")
+	_tex_near = load("res://assets/bg/bg_near.png")
 
 
 func _process(_delta: float) -> void:
@@ -35,75 +45,71 @@ func _process(_delta: float) -> void:
 		if player:
 			_camera = player.get_node_or_null("Camera2D")
 		return
+
+	var height := GameManager.start_y - _camera.global_position.y
+	rain_factor = clampf(1.0 - (height - RAIN_FULL_HEIGHT) / RAIN_FADE_RANGE, 0.0, 1.0)
+
 	queue_redraw()
 
 
 func _draw() -> void:
-	if _camera == null:
+	if _camera == null or _tex_far == null:
 		return
 
+	var cam_x := _camera.global_position.x
 	var cam_y := _camera.global_position.y
+	var screen_left := cam_x - VIEWPORT_W * 0.5
 	var screen_top := cam_y - VIEWPORT_H * 0.5
-	var screen_bottom := cam_y + VIEWPORT_H * 0.5
 
-	# --- Gradient background (fills the visible viewport) ---
-	var grad_h := VIEWPORT_H / 8.0
-	for i in range(8):
-		var frac_top := float(i) / 8.0
-		var frac_bot := float(i + 1) / 8.0
-		var c_top := COLOR_TOP.lerp(COLOR_BOTTOM, frac_top)
-		var c_bot := COLOR_TOP.lerp(COLOR_BOTTOM, frac_bot)
-		var y_top := screen_top + grad_h * i
-		# Use the average of top/bottom for a simple banded gradient
-		var avg := c_top.lerp(c_bot, 0.5)
-		draw_rect(Rect2(-50, y_top, VIEWPORT_W + 100, grad_h + 1), avg)
+	# --- Sky gradient (shifts from rainy blue-grey to forest green) ---
+	var sky_top := SKY_RAIN_TOP.lerp(SKY_CLEAR_TOP, 1.0 - rain_factor)
+	var sky_bot := SKY_RAIN_BOT.lerp(SKY_CLEAR_BOT, 1.0 - rain_factor)
+	_draw_sky(screen_left, screen_top, sky_top, sky_bot)
 
-	# --- Tree silhouettes (parallax layers) ---
-	for li in range(_tree_layers.size()):
-		var layer: Dictionary = _tree_layers[li]
-		var pf: float = layer["parallax"]
-		var col: Color = layer["color"]
-		var trees_in_layer: Array = _trees[li]
+	# --- Parallax forest layers ---
+	var textures: Array[Texture2D] = [_tex_far, _tex_mid, _tex_near]
+	for i in range(textures.size()):
+		var tex: Texture2D = textures[i]
+		var parallax: float = _layer_settings[i][0]
+		var alpha: float = _layer_settings[i][1]
+		_draw_parallax_layer(tex, parallax, alpha, cam_y, screen_left, screen_top)
 
-		# Parallax offset: trees scroll slower than the camera
-		var offset_y := cam_y * (1.0 - pf)
-
-		for tree in trees_in_layer:
-			var tx: float = tree["x"]
-			var tw: float = tree["w"]
-			var th: float = tree["h"]
-			var base_y: float = tree["base_y"]
-
-			# Tile the tree column vertically so it always covers the viewport
-			var tile_h := th + 200.0
-			var shifted_base := base_y + fmod(offset_y, tile_h)
-			# Draw a few copies to cover the screen
-			for rep in range(-2, 3):
-				var ty := shifted_base + rep * tile_h - th
-				if ty < screen_bottom + 50 and ty + th > screen_top - 50:
-					draw_rect(Rect2(tx, ty, tw, th), col)
+	# --- Rain mood overlay (subtle blue tint) ---
+	if rain_factor > 0.01:
+		var tint := Color(0.05, 0.08, 0.15, 0.10 * rain_factor)
+		draw_rect(Rect2(screen_left - 20, screen_top - 20,
+						VIEWPORT_W + 40, VIEWPORT_H + 40), tint)
 
 
-func _seed_trees() -> void:
-	var rng := RandomNumberGenerator.new()
-	rng.seed = 12345  # Fixed seed for consistent look
+func _draw_sky(x: float, y: float, top_col: Color, bot_col: Color) -> void:
+	var margin := 20.0
+	var w := VIEWPORT_W + margin * 2.0
+	var h := VIEWPORT_H + margin * 2.0
+	var bands := 8
+	var band_h := h / float(bands)
+	for b in range(bands):
+		var frac := (float(b) + 0.5) / float(bands)
+		var col := top_col.lerp(bot_col, frac)
+		draw_rect(Rect2(x - margin, y - margin + band_h * float(b),
+						w, band_h + 1.0), col)
 
-	for layer in _tree_layers:
-		var layer_trees: Array = []
-		var count: int = layer["count"]
-		var w_min: float = layer["w_min"]
-		var w_max: float = layer["w_max"]
 
-		for i in range(count):
-			var tw := rng.randf_range(w_min, w_max)
-			# Trees are placed on the left or right edges of the viewport
-			var tx: float
-			if i % 2 == 0:
-				tx = rng.randf_range(-tw * 0.3, 25.0)
-			else:
-				tx = rng.randf_range(VIEWPORT_W - 25.0, VIEWPORT_W + tw * 0.3)
-			var th := rng.randf_range(80.0, 200.0)
-			var base_y := rng.randf_range(0.0, 400.0)
-			layer_trees.append({ "x": tx, "w": tw, "h": th, "base_y": base_y })
+func _draw_parallax_layer(tex: Texture2D, parallax: float, alpha: float,
+						   cam_y: float, screen_left: float,
+						   screen_top: float) -> void:
+	var tex_w := float(tex.get_width())
+	var tex_h := float(tex.get_height())
 
-		_trees.append(layer_trees)
+	# Parallax offset: how much the layer lags behind the camera
+	var parallax_offset := cam_y * (1.0 - parallax)
+
+	# First tile index that could be on-screen
+	var first_n := int(floor((screen_top - parallax_offset) / tex_h)) - 1
+
+	var tint := Color(1.0, 1.0, 1.0, alpha)
+	var y := float(first_n) * tex_h + parallax_offset
+
+	while y < screen_top + VIEWPORT_H + tex_h:
+		draw_texture_rect(tex, Rect2(screen_left, y, tex_w, tex_h),
+						  false, tint)
+		y += tex_h

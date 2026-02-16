@@ -81,6 +81,7 @@ func _process(delta: float) -> void:
 		fail_height_label.text = "Reached: %dm" % int(GameManager.max_height)
 		AudioManager.play_fall()
 		AudioManager.stop_bgm()
+		AudioManager.stop_rain()
 
 
 func _input(_event: InputEvent) -> void:

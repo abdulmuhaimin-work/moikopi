@@ -107,6 +107,7 @@ func go_to_menu() -> void:
 		stats["total_height"] += max_height
 		save_data()
 	AudioManager.stop_bgm()
+	AudioManager.stop_rain()
 	game_state = GameState.NOT_STARTED
 	elapsed_time = 0.0
 	max_height = 0.0
