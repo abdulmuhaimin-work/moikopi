@@ -2,7 +2,11 @@ extends Node
 
 signal goal_reached(time_str: String)
 
+enum GameMode { ENDLESS, STORY }
 enum GameState { NOT_STARTED, RUNNING, ENDLESS, FAILED }
+
+var game_mode: GameMode = GameMode.ENDLESS
+var current_story_level_path: String = ""  # Set when entering story mode
 
 var game_state: GameState = GameState.NOT_STARTED
 var elapsed_time: float = 0.0
@@ -32,6 +36,10 @@ var stats := {
 const SAVE_PATH := "user://best_times.cfg"
 const GAME_SCENE := "res://main.tscn"
 const MENU_SCENE := "res://scenes/menu.tscn"
+const PLAYER_SCENE := "res://scenes/player.tscn"
+const STORY_LEVELS := [
+	"res://scenes/story/level_01.tscn",
+]
 
 
 func _ready() -> void:
@@ -99,7 +107,10 @@ func restart() -> void:
 	max_height = 0.0
 	charge_percent = 0.0
 	is_charging = false
-	get_tree().change_scene_to_file(GAME_SCENE)
+	if game_mode == GameMode.STORY and current_story_level_path != "":
+		get_tree().change_scene_to_file(current_story_level_path)
+	else:
+		get_tree().change_scene_to_file(GAME_SCENE)
 
 
 func go_to_menu() -> void:
@@ -109,11 +120,26 @@ func go_to_menu() -> void:
 	AudioManager.stop_bgm()
 	AudioManager.stop_rain()
 	game_state = GameState.NOT_STARTED
+	game_mode = GameMode.ENDLESS
+	current_story_level_path = ""
 	elapsed_time = 0.0
 	max_height = 0.0
 	charge_percent = 0.0
 	is_charging = false
 	get_tree().change_scene_to_file(MENU_SCENE)
+
+
+func start_endless() -> void:
+	game_mode = GameMode.ENDLESS
+	get_tree().change_scene_to_file(GAME_SCENE)
+
+
+func start_story(level_index: int = 0) -> void:
+	game_mode = GameMode.STORY
+	if level_index < 0 or level_index >= STORY_LEVELS.size():
+		return
+	current_story_level_path = STORY_LEVELS[level_index]
+	get_tree().change_scene_to_file(current_story_level_path)
 
 
 func get_time_string(time: float = -1.0) -> String:

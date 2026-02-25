@@ -90,7 +90,7 @@ shape = SubResource("collision_rect")
 [node name="AimArrow" type="Line2D" parent="." unique_id=1257178432]
 points = PackedVector2Array(0, 0, 30, 0)
 width = 1.5
-default_color = Color(1, 0.8, 0.3, 0.9)
+default_color = Color(0, 1, 1, 0.9)
 
 [node name="Camera2D" type="Camera2D" parent="." unique_id=272221252]
 position = Vector2(0, -30)
