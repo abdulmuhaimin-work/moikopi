@@ -1,0 +1,148 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://hf7rpildjx4a" path="res://scripts/story_level.gd" id="1_story"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/story/Platform.tscn" id="4_platform"]
+[ext_resource type="PackedScene" path="res://scenes/story/Goal.tscn" id="5_goal"]
+[ext_resource type="PackedScene" path="res://scenes/story/CutsceneTrigger.tscn" id="6_cutscene"]
+[ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="7_scanline"]
+
+[node name="Level05" type="Node2D"]
+script = ExtResource("1_story")
+camera_limit_left = -20
+camera_limit_top = -1020
+camera_limit_right = 340
+camera_limit_bottom = 220
+death_y = 230.0
+level_index = 4
+
+[node name="Background" parent="." instance=ExtResource("2_bg")]
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="Ground" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, 170)
+platform_width = 200.0
+platform_height = 16.0
+platform_color = Color(0.2, 0.15, 0.4, 1)
+
+[node name="Right1" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(230, 112)
+platform_width = 50.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left1" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(82, 50)
+platform_width = 50.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="Right2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(242, -15)
+platform_width = 45.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(72, -82)
+platform_width = 45.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="Rest1" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, -152)
+platform_width = 150.0
+platform_height = 10.0
+platform_color = Color(0.3, 0.25, 0.55, 0.95)
+
+[node name="Right3" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(240, -225)
+platform_width = 45.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left3" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(78, -298)
+platform_width = 45.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="Right4" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(245, -370)
+platform_width = 40.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left4" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(72, -442)
+platform_width = 40.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="Rest2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, -512)
+platform_width = 140.0
+platform_height = 10.0
+platform_color = Color(0.3, 0.25, 0.55, 0.95)
+
+[node name="Right5" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(235, -585)
+platform_width = 40.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left5" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(82, -658)
+platform_width = 40.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="Right6" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(238, -730)
+platform_width = 35.0
+platform_height = 10.0
+platform_color = Color(0.1, 0.9, 1, 0.9)
+
+[node name="Left6" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(78, -802)
+platform_width = 35.0
+platform_height = 10.0
+platform_color = Color(0.95, 0.3, 0.85, 0.9)
+
+[node name="GoalPlatform" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, -878)
+platform_width = 140.0
+platform_height = 14.0
+platform_color = Color(0.95, 0.95, 1, 1)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(80, 150)
+
+[node name="Goal" parent="." instance=ExtResource("5_goal")]
+position = Vector2(160, -935)
+
+[node name="CutsceneTrigger" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, 155)
+cutscene_text = "The apex. Everything you've climbed for ends here."
+display_duration = 3.5
+
+[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -165)
+cutscene_text = "The signal is strongest here. Almost blinding."
+display_duration = 3.0
+
+[node name="CutsceneTrigger3" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -525)
+cutscene_text = "You're not the first to climb. But you can be the last."
+display_duration = 3.5
+
+[node name="CutsceneTrigger4" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -890)
+cutscene_text = "You reached the peak. Moikopi—the Stack sees you."
+display_duration = 4.5
+
+[node name="UI" parent="." instance=ExtResource("3_ui")]
+
+[node name="ScanlineOverlay" parent="." instance=ExtResource("7_scanline")]

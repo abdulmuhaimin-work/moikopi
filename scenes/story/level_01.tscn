@@ -15,6 +15,7 @@ camera_limit_top = -100
 camera_limit_right = 340
 camera_limit_bottom = 220
 death_y = 230.0
+next_level_path = "res://scenes/story/level_02.tscn"
 
 [node name="Background" parent="." unique_id=140523359 instance=ExtResource("2_bg")]
 
@@ -54,6 +55,11 @@ position = Vector2(160, -45)
 position = Vector2(287, 67)
 cutscene_text = "Jump left and right to climb. Reach the GOAL!"
 display_duration = 4.0
+
+[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(70, 42)
+cutscene_text = "The Stack goes up. So do you."
+display_duration = 3.0
 
 [node name="UI" parent="." unique_id=1961899421 instance=ExtResource("3_ui")]
 

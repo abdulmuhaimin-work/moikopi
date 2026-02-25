@@ -39,6 +39,10 @@ const MENU_SCENE := "res://scenes/menu.tscn"
 const PLAYER_SCENE := "res://scenes/player.tscn"
 const STORY_LEVELS := [
 	"res://scenes/story/level_01.tscn",
+	"res://scenes/story/level_02.tscn",
+	"res://scenes/story/level_03.tscn",
+	"res://scenes/story/level_04.tscn",
+	"res://scenes/story/level_05.tscn",
 ]
 
 
