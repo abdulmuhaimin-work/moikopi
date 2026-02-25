@@ -78,17 +78,17 @@ var platforms: Array = [
 	[50, -70, 150, 12],
 ]
 
-# Hand-crafted level colors (warm forest palette)
-var platform_color := Color(0.30, 0.42, 0.22)
-var platform_alt := Color(0.26, 0.38, 0.20)
-var rest_color := Color(0.40, 0.32, 0.22)
-var finish_color := Color(0.85, 0.65, 0.20)
-var ground_color := Color(0.28, 0.22, 0.15)
+# Hand-crafted level colors (neon cyberpunk palette)
+var platform_color := Color(0.00, 0.75, 0.85, 0.9)
+var platform_alt := Color(0.85, 0.15, 0.75, 0.9)
+var rest_color := Color(0.25, 0.15, 0.45, 0.95)
+var finish_color := Color(0.00, 1.0, 1.0, 1.0)
+var ground_color := Color(0.12, 0.05, 0.25, 1.0)
 
-# Endless section colors (deeper forest tones)
-var endless_color_a := Color(0.22, 0.35, 0.20)
-var endless_color_b := Color(0.25, 0.30, 0.18)
-var endless_rest := Color(0.35, 0.30, 0.20)
+# Endless section colors (neon variants)
+var endless_color_a := Color(0.00, 0.65, 0.80, 0.9)
+var endless_color_b := Color(0.75, 0.10, 0.70, 0.9)
+var endless_rest := Color(0.20, 0.10, 0.40, 0.95)
 
 const DEATH_Y := 220.0  # Below the starting platform
 const VIEWPORT_WIDTH := 320.0
@@ -119,13 +119,12 @@ var _prev_y: float = 0.0
 const REACH_POWER := 460.0
 const REACH_SAMPLES := 25  # Angle samples for the sweep
 
-# --- Rain & leaf particle references ---
-var _rain_particles: CPUParticles2D = null
-var _leaf_particles: CPUParticles2D = null
-var _background: Node2D = null
+# --- Neon particle references ---
+var _digital_rain_particles: CPUParticles2D = null
+var _neon_drift_particles: CPUParticles2D = null
 var _cam: Camera2D = null
-const RAIN_MAX_AMOUNT := 120
-const LEAF_BASE_AMOUNT := 20
+const DIGITAL_RAIN_AMOUNT := 100
+const NEON_DRIFT_AMOUNT := 25
 
 
 func _ready() -> void:
@@ -172,15 +171,12 @@ func _ready() -> void:
 	_prev_w = goal_plat[2]
 	_prev_y = finish_y
 
-	# Floating leaf particles (attached to camera so they stay in view)
-	call_deferred("_create_leaf_particles")
+	# Neon atmosphere particles
+	call_deferred("_create_neon_drift_particles")
+	call_deferred("_create_digital_rain_particles")
 
-	# Rain particle system (also on camera, intensity driven by background rain_factor)
-	call_deferred("_create_rain_particles")
-
-	# Start background music and rain ambience
+	# Start background music
 	AudioManager.play_bgm()
-	AudioManager.play_rain()
 
 
 func _process(_delta: float) -> void:
@@ -192,8 +188,8 @@ func _process(_delta: float) -> void:
 	if _player.global_position.y < _gen_y + GEN_LOOK_AHEAD:
 		_generate_chunk()
 
-	# Update rain intensity from the background's rain_factor
-	_update_rain()
+	# Update particle positions to follow camera
+	_update_particles()
 
 
 func _generate_chunk() -> void:
@@ -352,7 +348,7 @@ func _create_rest_walls(_plat_x: float, plat_y: float, _plat_w: float) -> void:
 	var wall_w := 6.0
 	var wall_h := 90.0
 	var wall_top := plat_y - 10.0   # Slightly above the rest platform
-	var wall_color := Color(0.38, 0.30, 0.22, 0.85)
+	var wall_color := Color(0.40, 0.20, 0.60, 0.9)
 
 	# Left wall at the left viewport edge
 	_create_platform(0.0, wall_top, wall_w, wall_h, wall_color)
@@ -360,116 +356,89 @@ func _create_rest_walls(_plat_x: float, plat_y: float, _plat_w: float) -> void:
 	_create_platform(VIEWPORT_WIDTH - wall_w, wall_top, wall_w, wall_h, wall_color)
 
 
-func _create_leaf_particles() -> void:
+func _create_neon_drift_particles() -> void:
 	var player := get_node_or_null("../Player")
 	if player == null:
 		return
 	_cam = player.get_node_or_null("Camera2D")
-	_background = get_node_or_null("../Background")
 
-	var leaves := CPUParticles2D.new()
-	leaves.emitting = true
-	leaves.amount = 20
-	leaves.lifetime = 10.0
-	leaves.speed_scale = 0.6
-	leaves.explosiveness = 0.0
-	leaves.z_index = 5
+	var drift := CPUParticles2D.new()
+	drift.emitting = true
+	drift.amount = NEON_DRIFT_AMOUNT
+	drift.lifetime = 8.0
+	drift.speed_scale = 0.5
+	drift.explosiveness = 0.0
+	drift.z_index = 5
 
-	# Emission: wide box that will be centered on camera each frame
-	leaves.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
-	leaves.emission_rect_extents = Vector2(200, 10)
+	drift.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
+	drift.emission_rect_extents = Vector2(220, 15)
 
-	# Movement: gentle drift downward with slight horizontal sway
-	leaves.direction = Vector2(0, 1)
-	leaves.spread = 30.0
-	leaves.initial_velocity_min = 5.0
-	leaves.initial_velocity_max = 12.0
-	leaves.gravity = Vector2(0, 4)
+	drift.direction = Vector2(0, 1)
+	drift.spread = 25.0
+	drift.initial_velocity_min = 4.0
+	drift.initial_velocity_max = 10.0
+	drift.gravity = Vector2(2, 3)
 
-	# Appearance: visible squares that fade
-	leaves.scale_amount_min = 1.5
-	leaves.scale_amount_max = 3.0
+	drift.scale_amount_min = 1.0
+	drift.scale_amount_max = 2.5
 
-	# Warm forest leaf colours
-	leaves.color = Color(0.60, 0.55, 0.30, 0.65)
+	# Cyan and magenta neon drift
+	drift.color = Color(0.0, 0.9, 1.0, 0.4)
 	var grad := Gradient.new()
-	grad.set_color(0, Color(0.55, 0.60, 0.30, 0.70))
-	grad.set_color(1, Color(0.50, 0.40, 0.22, 0.10))
-	leaves.color_ramp = grad
+	grad.set_color(0, Color(0.9, 0.2, 0.9, 0.5))
+	grad.set_color(1, Color(0.0, 0.7, 0.9, 0.0))
+	drift.color_ramp = grad
 
-	# Add as child of Level (not Camera2D) — position updated in _process
-	add_child(leaves)
-	_leaf_particles = leaves
+	add_child(drift)
+	_neon_drift_particles = drift
 
 
-func _create_rain_particles() -> void:
+func _create_digital_rain_particles() -> void:
 	var rain := CPUParticles2D.new()
 	rain.emitting = true
-	rain.amount = RAIN_MAX_AMOUNT
-	rain.lifetime = 0.8
+	rain.amount = DIGITAL_RAIN_AMOUNT
+	rain.lifetime = 0.7
 	rain.speed_scale = 1.0
 	rain.explosiveness = 0.0
 	rain.z_index = 5
 
-	# Emission: wide rectangle, position updated each frame to follow camera
 	rain.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	rain.emission_rect_extents = Vector2(200, 5)
 
-	# Movement: fast downward with slight wind angle
-	rain.direction = Vector2(0.12, 1.0)
-	rain.spread = 8.0
-	rain.initial_velocity_min = 200.0
-	rain.initial_velocity_max = 300.0
-	rain.gravity = Vector2(8, 100)
+	# Straight down for "digital rain" look
+	rain.direction = Vector2(0, 1)
+	rain.spread = 2.0
+	rain.initial_velocity_min = 180.0
+	rain.initial_velocity_max = 280.0
+	rain.gravity = Vector2(0, 80)
 
-	# Appearance: visible streaks
-	rain.scale_amount_min = 1.0
-	rain.scale_amount_max = 2.5
+	rain.scale_amount_min = 0.8
+	rain.scale_amount_max = 1.8
 
-	# Bright rain colour so it's clearly visible
-	rain.color = Color(0.80, 0.85, 0.95, 0.60)
+	# Bright cyan neon streaks
+	rain.color = Color(0.0, 1.0, 1.0, 0.5)
 	var grad := Gradient.new()
-	grad.set_color(0, Color(0.85, 0.90, 1.0, 0.65))
-	grad.set_color(1, Color(0.65, 0.70, 0.80, 0.10))
+	grad.set_color(0, Color(0.2, 1.0, 1.0, 0.6))
+	grad.set_color(1, Color(0.0, 0.6, 0.7, 0.0))
 	rain.color_ramp = grad
 
-	# Add as child of Level — position updated in _process
 	add_child(rain)
-	_rain_particles = rain
+	_digital_rain_particles = rain
 
 
-func _update_rain() -> void:
-	# Move particles to follow the camera
-	if _cam != null:
-		var cam_pos := _cam.global_position
-		if _rain_particles != null:
-			_rain_particles.global_position = Vector2(cam_pos.x, cam_pos.y - 110)
-		if _leaf_particles != null:
-			_leaf_particles.global_position = Vector2(cam_pos.x, cam_pos.y - 110)
-
-	# Update rain intensity from background rain_factor
-	if _rain_particles == null:
+func _update_particles() -> void:
+	if _cam == null:
+		var player := get_node_or_null("../Player")
+		if player != null:
+			_cam = player.get_node_or_null("Camera2D")
+	if _cam == null:
 		return
-	if _background == null:
-		_background = get_node_or_null("../Background")
-
-	var rf := 1.0
-	if _background != null:
-		var val = _background.get("rain_factor")
-		if val != null:
-			rf = val
-
-	_rain_particles.emitting = rf > 0.01
-	_rain_particles.amount = maxi(1, int(RAIN_MAX_AMOUNT * rf))
-
-	# Sync rain audio volume
-	AudioManager.set_rain_volume(rf)
-
-	# Adjust leaf particles in rain
-	if _leaf_particles != null:
-		var leaf_factor := 1.0 - rf * 0.4
-		_leaf_particles.amount = maxi(8, int(LEAF_BASE_AMOUNT * leaf_factor))
-		_leaf_particles.gravity = Vector2(4.0 + rf * 16.0, 4.0)
+	var cam_pos := _cam.global_position
+	var emit_y := cam_pos.y - 100
+	if _digital_rain_particles != null:
+		_digital_rain_particles.global_position = Vector2(cam_pos.x, emit_y)
+	if _neon_drift_particles != null:
+		_neon_drift_particles.global_position = Vector2(cam_pos.x, emit_y)
 
 
 func _create_finish_label(finish_y: float) -> void:
@@ -477,7 +446,7 @@ func _create_finish_label(finish_y: float) -> void:
 	label.text = "GOAL"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 10)
-	label.add_theme_color_override("font_color", Color(0.85, 0.65, 0.20))
+	label.add_theme_color_override("font_color", Color(0.0, 1.0, 1.0))
 	label.position = Vector2(120, finish_y - 20)
 	label.size = Vector2(80, 16)
 	add_child(label)
@@ -488,7 +457,7 @@ func _create_beyond_label(finish_y: float) -> void:
 	label.text = "~ ENDLESS ~"
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.add_theme_font_size_override("font_size", 7)
-	label.add_theme_color_override("font_color", Color(0.55, 0.65, 0.40, 0.7))
+	label.add_theme_color_override("font_color", Color(0.9, 0.2, 0.9, 0.85))
 	label.position = Vector2(100, finish_y - 50)
 	label.size = Vector2(120, 12)
 	add_child(label)

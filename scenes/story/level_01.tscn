@@ -1,0 +1,60 @@
+[gd_scene format=3 uid="uid://dxvhfyhicdbrq"]
+
+[ext_resource type="Script" uid="uid://hf7rpildjx4a" path="res://scripts/story_level.gd" id="1_story"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/story/Platform.tscn" id="4_platform"]
+[ext_resource type="PackedScene" path="res://scenes/story/Goal.tscn" id="5_goal"]
+[ext_resource type="PackedScene" path="res://scenes/story/CutsceneTrigger.tscn" id="6_cutscene"]
+[ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="7_scanline"]
+
+[node name="Level01" type="Node2D" unique_id=2100358038]
+script = ExtResource("1_story")
+camera_limit_left = -20
+camera_limit_top = -100
+camera_limit_right = 340
+camera_limit_bottom = 220
+death_y = 230.0
+
+[node name="Background" parent="." unique_id=140523359 instance=ExtResource("2_bg")]
+
+[node name="Platforms" type="Node2D" parent="." unique_id=351212618]
+
+[node name="Ground" parent="Platforms" unique_id=205226800 instance=ExtResource("4_platform")]
+position = Vector2(160, 170)
+platform_width = 260.0
+platform_height = 20.0
+platform_color = Color(0.12, 0.05, 0.25, 1)
+
+[node name="Right1" parent="Platforms" unique_id=1732354854 instance=ExtResource("4_platform")]
+position = Vector2(250, 130)
+platform_width = 60.0
+
+[node name="Mid" parent="Platforms" unique_id=438394679 instance=ExtResource("4_platform")]
+position = Vector2(305, 80)
+platform_width = 70.0
+platform_color = Color(0.85, 0.15, 0.75, 0.9)
+
+[node name="Left1" parent="Platforms" unique_id=926118856 instance=ExtResource("4_platform")]
+position = Vector2(70, 55)
+platform_width = 65.0
+platform_color = Color(0, 0.65, 0.8, 0.9)
+
+[node name="Top" parent="Platforms" unique_id=1433184313 instance=ExtResource("4_platform")]
+position = Vector2(161, 31)
+platform_color = Color(0.25, 0.15, 0.45, 0.95)
+
+[node name="PlayerStart" type="Marker2D" parent="." unique_id=8040791]
+position = Vector2(80, 149)
+
+[node name="Goal" parent="." unique_id=1047359431 instance=ExtResource("5_goal")]
+position = Vector2(160, -45)
+
+[node name="CutsceneTrigger" parent="." unique_id=969587066 instance=ExtResource("6_cutscene")]
+position = Vector2(287, 67)
+cutscene_text = "Jump left and right to climb. Reach the GOAL!"
+display_duration = 4.0
+
+[node name="UI" parent="." unique_id=1961899421 instance=ExtResource("3_ui")]
+
+[node name="ScanlineOverlay" parent="." instance=ExtResource("7_scanline")]

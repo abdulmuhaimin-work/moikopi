@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://bj8j52rsbqdu"]
+[gd_scene load_steps=6 format=3 uid="uid://bj8j52rsbqdu"]
 
 [ext_resource type="PackedScene" path="res://scenes/background.tscn" id="0_bg"]
 [ext_resource type="PackedScene" path="res://scenes/level.tscn" id="1_level"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2_player"]
 [ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="4_scanline"]
 
 [node name="Main" type="Node2D"]
 
@@ -15,3 +16,5 @@
 position = Vector2(160, 148)
 
 [node name="UI" parent="." instance=ExtResource("3_ui")]
+
+[node name="ScanlineOverlay" parent="." instance=ExtResource("4_scanline")]

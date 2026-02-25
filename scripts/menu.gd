@@ -2,12 +2,15 @@ extends Control
 
 
 @onready var best_time_label: Label = $VBox/BestTimeLabel
-@onready var play_hint: Label = $VBox/PlayHint
 @onready var controls_label: Label = $VBox/Controls
 @onready var stats_label: Label = $VBox/StatsLabel
+@onready var btn_endless: Button = $VBox/ModeButtons/BtnEndless
+@onready var btn_story: Button = $VBox/ModeButtons/BtnStory
 
 
 func _ready() -> void:
+	btn_endless.pressed.connect(_on_endless)
+	btn_story.pressed.connect(_on_story)
 	# Records
 	var parts: Array[String] = []
 	if GameManager.best_height > 0.0:
@@ -16,20 +19,17 @@ func _ready() -> void:
 		parts.append("Best: %s" % GameManager.get_time_string(GameManager.best_finish_time))
 	best_time_label.text = "\n".join(parts)
 
-	# Platform hints
+	# Controls hint
 	if DisplayServer.is_touchscreen_available():
-		play_hint.text = "Tap to play"
-		controls_label.text = "Left side = Jump left | Right side = Jump right"
+		controls_label.text = "Tap = Endless | Left/Right = Jump"
 	else:
-		play_hint.text = "Press A/D to play"
-		controls_label.text = "A / Left = Jump left | D / Right = Jump right"
+		controls_label.text = "A/D = Jump | R = Restart | Esc = Menu"
 
 	# Lifetime stats
 	_update_stats()
 
-	# Rain atmosphere on menu
-	_create_menu_rain()
-	AudioManager.play_rain()
+	# Neon atmosphere on menu
+	_create_menu_neon_particles()
 
 
 func _update_stats() -> void:
@@ -55,46 +55,45 @@ func _update_stats() -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton and event.pressed:
-		_start_game()
+		_on_endless()
 	elif event.is_action_pressed("jump_left") or event.is_action_pressed("jump_right"):
-		_start_game()
+		_on_endless()
 
 
-func _start_game() -> void:
-	AudioManager.stop_rain()
-	get_tree().change_scene_to_file(GameManager.GAME_SCENE)
+func _on_endless() -> void:
+	GameManager.start_endless()
 
 
-func _create_menu_rain() -> void:
+func _on_story() -> void:
+	GameManager.start_story(0)
+
+
+func _create_menu_neon_particles() -> void:
 	var rain := CPUParticles2D.new()
 	rain.emitting = true
-	rain.amount = 80
-	rain.lifetime = 0.7
+	rain.amount = 60
+	rain.lifetime = 0.8
 	rain.speed_scale = 1.0
 	rain.explosiveness = 0.0
+	rain.position = Vector2(160, -20)
 
-	# Emission: wide rectangle above the viewport
 	rain.emission_shape = CPUParticles2D.EMISSION_SHAPE_RECTANGLE
 	rain.emission_rect_extents = Vector2(200, 5)
-	rain.position = Vector2(160, -10)
 
-	# Movement: fast downward with slight wind
-	rain.direction = Vector2(0.12, 1.0)
-	rain.spread = 8.0
-	rain.initial_velocity_min = 180.0
-	rain.initial_velocity_max = 280.0
-	rain.gravity = Vector2(8, 100)
+	rain.direction = Vector2(0, 1)
+	rain.spread = 3.0
+	rain.initial_velocity_min = 150.0
+	rain.initial_velocity_max = 250.0
+	rain.gravity = Vector2(0, 60)
 
-	# Visible rain streaks (>= 1px for nearest-neighbor rendering)
 	rain.scale_amount_min = 1.0
 	rain.scale_amount_max = 2.0
 
-	# Bright rain visible against dark menu background
-	rain.color = Color(0.80, 0.85, 0.95, 0.55)
+	# Neon cyan digital rain
+	rain.color = Color(0.0, 1.0, 1.0, 0.5)
 	var grad := Gradient.new()
-	grad.set_color(0, Color(0.85, 0.90, 1.0, 0.60))
-	grad.set_color(1, Color(0.65, 0.70, 0.80, 0.10))
+	grad.set_color(0, Color(0.2, 1.0, 1.0, 0.6))
+	grad.set_color(1, Color(0.0, 0.5, 0.6, 0.0))
 	rain.color_ramp = grad
 
-	# Render on top of background and overlay (particles are translucent)
 	add_child(rain)

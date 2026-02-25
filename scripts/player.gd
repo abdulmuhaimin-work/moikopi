@@ -39,6 +39,7 @@ var _jump_released := false
 
 
 func _ready() -> void:
+	add_to_group("player")
 	aim_arrow.visible = false
 	GameManager.start_y = global_position.y
 
@@ -140,11 +141,12 @@ func _process_charging(delta: float) -> void:
 	var arrow_len := ARROW_MIN_LEN + power_ratio * (ARROW_MAX_LEN - ARROW_MIN_LEN)
 	var dir := Vector2(cos(current_angle), -sin(current_angle))
 	aim_arrow.points = PackedVector2Array([Vector2.ZERO, dir * arrow_len])
+	# Neon cyan (low power) to magenta (full power)
 	aim_arrow.default_color = Color(
+		power_ratio * 0.95,
+		0.15,
 		1.0,
-		1.0 - power_ratio * 0.7,
-		0.3 - power_ratio * 0.3,
-		0.9
+		0.95
 	)
 
 	GameManager.is_charging = true
