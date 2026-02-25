@@ -100,15 +100,32 @@ position = Vector2(80, 150)
 [node name="Goal" parent="." instance=ExtResource("5_goal")]
 position = Vector2(160, -615)
 
-[node name="CutsceneTrigger" parent="." instance=ExtResource("6_cutscene")]
+[node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(240, 103)
+cutscene_text = "Data streams drift past like rain that falls upward."
+display_duration = 4.5
+
+[node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
 position = Vector2(160, -92)
-cutscene_text = "You're halfway to the apex. The data streams remember every climber."
+cutscene_text = "This is where the network breathes. Every signal that ever traveled through the Stack left a trace here. Including yours."
+display_duration = 3.5
+mode = 1
+
+[node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(250, -232)
+cutscene_text = "You can almost hear them. Voices encoded in light."
 display_duration = 4.0
 
-[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
+[node name="Cinematic2" parent="." instance=ExtResource("6_cutscene")]
 position = Vector2(160, -367)
-cutscene_text = "Don't look down."
+cutscene_text = "Halfway. The world below is already a blur. There is only up."
 display_duration = 2.5
+mode = 1
+
+[node name="Ambient3" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(80, -507)
+cutscene_text = "Something ahead is glowing brighter than the rest."
+display_duration = 3.5
 
 [node name="UI" parent="." instance=ExtResource("3_ui")]
 

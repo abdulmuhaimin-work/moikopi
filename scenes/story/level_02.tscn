@@ -82,15 +82,21 @@ position = Vector2(80, 150)
 [node name="Goal" parent="." instance=ExtResource("5_goal")]
 position = Vector2(160, -380)
 
-[node name="CutsceneTrigger" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, 155)
-cutscene_text = "The undercity never sleeps. Neither do you."
-display_duration = 3.5
+[node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(235, 103)
+cutscene_text = "Scratch marks on the walls. Others climbed here once."
+display_duration = 4.5
 
-[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
+[node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
 position = Vector2(160, -72)
-cutscene_text = "Keep climbing. The signal is stronger above."
+cutscene_text = "A voice from the static: We built this place to forget. You are climbing through our memories."
 display_duration = 3.0
+mode = 1
+
+[node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(80, -272)
+cutscene_text = "The grid flickers. For a moment you see sky."
+display_duration = 4.0
 
 [node name="UI" parent="." instance=ExtResource("3_ui")]
 

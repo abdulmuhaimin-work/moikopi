@@ -123,25 +123,49 @@ position = Vector2(80, 150)
 [node name="Goal" parent="." instance=ExtResource("5_goal")]
 position = Vector2(160, -935)
 
-[node name="CutsceneTrigger" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, 155)
-cutscene_text = "The apex. Everything you've climbed for ends here."
+[node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(130, 155)
+cutscene_text = "The apex. The air is thin and bright. Everything below you is noise. Everything above is silence."
 display_duration = 3.5
+mode = 1
 
-[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, -165)
-cutscene_text = "The signal is strongest here. Almost blinding."
-display_duration = 3.0
-
-[node name="CutsceneTrigger3" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, -525)
-cutscene_text = "You're not the first to climb. But you can be the last."
-display_duration = 3.5
-
-[node name="CutsceneTrigger4" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, -890)
-cutscene_text = "You reached the peak. Moikopi—the Stack sees you."
+[node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(72, -94)
+cutscene_text = "Your body remembers being something else. Before the Stack."
 display_duration = 4.5
+
+[node name="Cinematic2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -165)
+cutscene_text = "The ones who built this place left a question at the top. They never came back to hear the answer."
+display_duration = 3.5
+mode = 1
+
+[node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(245, -382)
+cutscene_text = "The platforms are thinning. The Stack is letting go of you."
+display_duration = 4.0
+
+[node name="Cinematic3" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -524)
+cutscene_text = "You were never climbing to escape. You were climbing to remember."
+display_duration = 3.0
+mode = 1
+
+[node name="Ambient3" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(82, -670)
+cutscene_text = "The signal is so clear now it almost sounds like your own name."
+display_duration = 4.5
+
+[node name="Ambient4" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(78, -814)
+cutscene_text = "One more jump. You already know what's up there."
+display_duration = 3.5
+
+[node name="Cinematic4" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -890)
+cutscene_text = "Moikopi. That is your name. The Stack didn't trap you. It kept you safe until you were ready to leave."
+display_duration = 5.0
+mode = 1
 
 [node name="UI" parent="." instance=ExtResource("3_ui")]
 

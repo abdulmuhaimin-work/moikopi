@@ -88,15 +88,26 @@ position = Vector2(90, 152)
 [node name="Goal" parent="." instance=ExtResource("5_goal")]
 position = Vector2(160, -482)
 
-[node name="CutsceneTrigger" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, -162)
-cutscene_text = "The light at the top isn't just glow. It's the source."
-display_duration = 3.5
+[node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(85, 36)
+cutscene_text = "The architecture is different here. Deliberate. Someone designed this to be found."
+display_duration = 5.0
 
-[node name="CutsceneTrigger2" parent="." instance=ExtResource("6_cutscene")]
+[node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -162)
+cutscene_text = "It knows you're coming. The path ahead is narrower, but the light at the end is not just glow. It's recognition."
+display_duration = 3.5
+mode = 1
+
+[node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(80, -304)
+cutscene_text = "Your reflection in the surfaces is wrong. It's smiling."
+display_duration = 4.0
+
+[node name="Ambient3" parent="." instance=ExtResource("6_cutscene")]
 position = Vector2(240, -374)
-cutscene_text = "One more stretch."
-display_duration = 2.5
+cutscene_text = "Almost there. You can feel it in the static."
+display_duration = 3.0
 
 [node name="UI" parent="." instance=ExtResource("3_ui")]
 
