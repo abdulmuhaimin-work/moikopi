@@ -5,8 +5,10 @@ Moikopi is a 2D vertical platformer game built with **Godot 4.6** (GL Compatibil
 ## Project structure
 
 - `project.godot` — Engine config (entry scene: `scenes/menu.tscn`)
-- `scripts/` — GDScript source files (player, level, game_manager, audio_manager, ui, menu, background)
+- `scripts/` — GDScript source files (player, level, game_manager, audio_manager, ui, menu, background, story_level, platform, cutscene_trigger)
 - `scenes/` — Godot `.tscn` scene files
+- `scenes/story/` — Story mode levels (`level_01.tscn` through `level_05.tscn`), plus `Platform.tscn`, `Goal.tscn`, `CutsceneTrigger.tscn`
+- `shaders/` — GLSL shaders (scanline_vignette, neon_glow)
 - `assets/` — Sprites, backgrounds, audio (WAV)
 - `build/` — Pre-built exports (Android APK, Web HTML5)
 - Autoloads: `GameManager`, `AudioManager`
@@ -39,6 +41,16 @@ The VM has display `:1` (Xvfb) running. Godot uses **llvmpipe** (software OpenGL
 | Jump right | D or Right Arrow (hold to charge, release to jump) |
 | Restart | R |
 | Menu | Escape |
+
+### Story mode
+
+Story mode has 5 levels chained via `next_level_path`. See `scenes/story/STORYLINE.md` for the narrative design and `scenes/story/README.md` for how to create/edit levels. To load a specific story level directly:
+
+```
+godot --path . --rendering-method gl_compatibility res://scenes/story/level_03.tscn
+```
+
+The `game_manager.gd` `STORY_LEVELS` array must list all story level paths. Level 5 (final) has no `next_level_path`, so it returns to the menu on completion.
 
 ### Import step
 
