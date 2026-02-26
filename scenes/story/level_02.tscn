@@ -1,0 +1,103 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" uid="uid://hf7rpildjx4a" path="res://scripts/story_level.gd" id="1_story"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="2_bg"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/story/Platform.tscn" id="4_platform"]
+[ext_resource type="PackedScene" path="res://scenes/story/Goal.tscn" id="5_goal"]
+[ext_resource type="PackedScene" path="res://scenes/story/CutsceneTrigger.tscn" id="6_cutscene"]
+[ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="7_scanline"]
+
+[node name="Level02" type="Node2D"]
+script = ExtResource("1_story")
+camera_limit_left = -20
+camera_limit_top = -450
+camera_limit_right = 340
+camera_limit_bottom = 220
+death_y = 230.0
+level_index = 1
+next_level_path = "res://scenes/story/level_03.tscn"
+
+[node name="Background" parent="." instance=ExtResource("2_bg")]
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="Ground" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, 170)
+platform_width = 240.0
+platform_height = 18.0
+platform_color = Color(0.1, 0.03, 0.15, 1)
+
+[node name="Right1" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(235, 115)
+platform_width = 55.0
+platform_height = 10.0
+platform_color = Color(0.6, 0.1, 0.2, 0.9)
+
+[node name="Left1" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(80, 60)
+platform_width = 55.0
+platform_height = 10.0
+platform_color = Color(0.5, 0.1, 0.4, 0.9)
+
+[node name="Right2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(245, 0)
+platform_width = 50.0
+platform_height = 10.0
+platform_color = Color(0.6, 0.1, 0.2, 0.9)
+
+[node name="RestPlatform" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, -60)
+platform_width = 150.0
+platform_height = 12.0
+platform_color = Color(0.15, 0.05, 0.2, 0.95)
+
+[node name="Left2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(75, -125)
+platform_width = 50.0
+platform_height = 10.0
+platform_color = Color(0.5, 0.1, 0.4, 0.9)
+
+[node name="Right3" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(245, -190)
+platform_width = 50.0
+platform_height = 10.0
+platform_color = Color(0.6, 0.1, 0.2, 0.9)
+
+[node name="Left3" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(80, -260)
+platform_width = 55.0
+platform_height = 10.0
+platform_color = Color(0.5, 0.1, 0.4, 0.9)
+
+[node name="GoalPlatform" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(160, -330)
+platform_width = 120.0
+platform_height = 12.0
+platform_color = Color(0.2, 0.5, 0.6, 0.9)
+
+[node name="PlayerStart" type="Marker2D" parent="."]
+position = Vector2(80, 150)
+
+[node name="Goal" parent="." instance=ExtResource("5_goal")]
+position = Vector2(160, -380)
+
+[node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(235, 103)
+cutscene_text = "Scratch marks on the walls. Others climbed here once."
+display_duration = 4.5
+
+[node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(160, -72)
+cutscene_text = "A voice from the static: We built this place to forget. You are climbing through our memories."
+display_duration = 3.0
+mode = 1
+
+[node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
+position = Vector2(80, -272)
+cutscene_text = "The grid flickers. For a moment you see sky."
+display_duration = 4.0
+
+[node name="UI" parent="." instance=ExtResource("3_ui")]
+
+[node name="ScanlineOverlay" parent="." instance=ExtResource("7_scanline")]

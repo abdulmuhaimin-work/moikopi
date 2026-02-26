@@ -1,12 +1,17 @@
 extends Area2D
 
-## Place in a story level. When the player enters, a cutscene runs (text + duration).
-## Set cutscene_text and display_duration in the inspector. One-shot (only fires once).
+## Triggers narrative text when the player enters.
+## Two modes:
+##   AMBIENT  – text fades in at the bottom of the screen, gameplay continues.
+##   CINEMATIC – letterbox bars slide in, text types out, player is frozen.
 
-signal cutscene_triggered(text: String, duration: float)
+enum Mode { AMBIENT, CINEMATIC }
 
-@export var cutscene_text: String = "Welcome to the level."
-@export var display_duration: float = 3.0
+signal cutscene_triggered(text: String, duration: float, mode: int)
+
+@export var cutscene_text: String = ""
+@export var display_duration: float = 4.0
+@export var mode: Mode = Mode.AMBIENT
 
 var _triggered: bool = false
 
@@ -22,4 +27,4 @@ func _on_body_entered(body: Node2D) -> void:
 	if not body.is_in_group("player"):
 		return
 	_triggered = true
-	cutscene_triggered.emit(cutscene_text, display_duration)
+	cutscene_triggered.emit(cutscene_text, display_duration, mode)
