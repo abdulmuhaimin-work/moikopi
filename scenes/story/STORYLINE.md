@@ -1,119 +1,148 @@
-# Moikopi — Story Mode: Storyline & Design
+# Moikopi — Compelling Storyline (Early-Stage Friendly)
 
-A single storyline for Story Mode, with notes for character and environment redesign so art and levels stay consistent.
-
----
-
-## Premise
-
-**Moikopi** is a small amphibian—once a normal frog—who woke up at the bottom of **the Stack**: a vertical megastructure in a neon-soaked cyber world. The Stack is a relic of the old network, a tower of data and light that now flickers between reality and simulation. Something at the **apex** holds the key to who they were—or who they can become. To find out, Moikopi has to climb: jump by jump, platform by platform, from the dark underbelly to the peak.
-
-**Endless mode** is the same world after the story: once you’ve reached the top, you keep climbing into the endless signal (optional headcanon: Moikopi keeps exploring the network).
+A single, expandable story for Story Mode that fits the current game and leaves room for more levels, characters, and twists as you add content.
 
 ---
 
-## Story Beats (for levels and cutscenes)
+## Why this story works
 
-Use these as a spine for level order and cutscene text. Each level can be one “chapter” or you can split chapters across several levels.
-
-| Level(s) | Chapter       | Story beat | Tone |
-|----------|----------------|------------|------|
-| 1        | **Awakening**  | Moikopi wakes at the bottom of the Stack. First platforms, first goal: “Get higher. Find out why you’re here.” | Confused, determined |
-| 2        | **Undercity**  | Climbing through the lowest tier—flickering grids, failing lights. A voice or log: “The Stack remembers. Keep going.” | Eerie, hopeful |
-| 3        | **The middle** | Mid-tier: more stable neon, data streams (particles), first real view of how high the tower goes. “You’re not the first to climb. You can be the first to reach the top.” | Wonder, tension |
-| 4        | **Close**      | Near the apex. Architecture changes—cleaner lines, stronger glow. “Almost there. The source is just above.” | Triumph, urgency |
-| 5 (final)| **Apex**       | Reach the Goal at the peak. Revelation: e.g. “You are Moikopi. The Stack chose you. Now choose: stay and become part of it, or jump back down and live in the world below.” (Or a simpler ending: “You reached the peak. The signal is yours.”) | Resolution, choice or triumph |
-
-Cutscene triggers in each level should deliver one short line or two that match the beat above (e.g. level 1: “Jump left and right to climb. Reach the GOAL!” is already a good tutorial line; you can add a second trigger with story text like “The Stack is waiting.”).
+- **One clear goal:** Reach the peak. Every level is “climb higher,” so gameplay and story stay aligned.
+- **Mystery, not lore dump:** You don’t have to explain everything up front. Who is Moikopi? Why the Stack? Answer in later levels—or leave it ambiguous.
+- **Scales with the game:** Start with 3–5 levels; add more chapters (new areas, flashbacks, other climbers) without changing the core premise.
+- **Mood over plot:** Neon, solitude, determination. Feels cohesive even with minimal dialogue.
 
 ---
 
-## Character redesign (Moikopi)
+## The hook (one sentence)
 
-- **Concept**  
-  A small, agile climber that fits a neon-cyber world: part creature, part signal. Not necessarily “realistic frog”—could be a data-frog, a glowing avatar, or a creature that emerged from the grid.
+**A small creature wakes at the bottom of a vertical world of light and data—with no memory, only the certainty that the answer is at the top.**
 
-- **Visual direction**  
-  - Silhouette: readable at small scale (big jump, small body).  
-  - Accent colors: cyan/magenta to match the neon palette; possible glow or subtle scan-line on the sprite.  
-  - Idle: subtle pulse or flicker.  
-  - Jump/charge: build-up of light or “data” around the character before launch.
-
-- **Lore**  
-  Name “Moikopi” can be what they’re called by the system, or their own reclaimed name. No need to over-explain; keep it mysterious so Endless mode still fits.
-
-- **Implementation**  
-  - Replace or recolor the current frog sprite to match the above (new sprite sheet or shader tint + glow).  
-  - Optional: second “story-only” player scene with a slightly different sprite (e.g. more glitchy or more “digital”) if you want Story vs Endless to feel different.
+That’s enough to carry the player. “Reach the peak” is both the mechanical goal and the story goal.
 
 ---
 
-## Environment redesign
+## Core premise
 
-Keep the current **neon grid + dark gradient** as the base; treat it as “the Stack’s” look. Different levels can vary **palette and density** instead of changing the whole engine.
+- **Moikopi** — The player character. Name can be what the system calls them, or a name they find along the way. Stays vague so you can add backstory later (e.g. “you were once …” in a late level).
+- **The Stack** — The world: a vertical megastructure of platforms, grids, and neon. Could be a tower, a simulation, a network, or a dream. You don’t have to decide yet; “climb the Stack” is enough.
+- **The peak** — Whatever matters is up there: truth, freedom, a person, or simply “what’s next.” The final level’s Goal is the payoff.
 
-- **Level 1 – Awakening**  
-  Dark purple/blue (as now). Grid subtle. Few platforms, clear “first steps” feel. Goal: “get out of the pit.”
-
-- **Level 2 – Undercity**  
-  Darker, more red/purple. Grid a bit more broken (e.g. fewer lines, or flicker in script). Platforms: rust-like or “corrupted” accent (dimmer cyan, more magenta). Optional: hazard color (e.g. red) for “don’t fall” zones.
-
-- **Level 3 – Mid-tier**  
-  Current neon look at full strength: cyan, magenta, clean grid. Platforms wider, more “data bridges.” Particles (digital rain / drift) a bit stronger. Feels like the “main” Stack.
-
-- **Level 4 – Near apex**  
-  Brighter, cleaner. More white/cyan, less magenta. Grid finer or softer. Platforms look more “solid” or “official”—gold or white accent for the final stretch.
-
-- **Level 5 – Apex**  
-  Bright, minimal. Goal platform or area clearly “the source”—e.g. white/cyan glow, or a simple terminal shape. One clear “you made it” platform.
-
-**Technical**  
-- You already have `platform_color` per platform; use it to match the table above.  
-- Optional: per-level background script or shader params (e.g. gradient colors, grid opacity) so each level scene can override the default neon background.  
-- Story-specific BGM or SFX per chapter can reinforce the tone (e.g. calmer at apex).
+**Endless mode** = after the story (or no story): same world, keep climbing. No need to justify it beyond “the climb continues.”
 
 ---
 
-## Level design checklist (per level)
+## Emotional throughline (for cutscenes and tone)
 
-- [ ] **PlayerStart** on a safe platform; spawn height correct (feet on surface).  
-- [ ] **Goal** placement matches the “peak” of that chapter (top of the level).  
-- [ ] **CutsceneTrigger(s)** with 1–2 lines that match the story beat for that chapter.  
-- [ ] **Platforms** use the chapter’s palette (undercity = darker, apex = brighter).  
-- [ ] **Camera limits** and **death_y** so the level feels like one continuous climb.  
-- [ ] **Next level path** set on the root (except the last level, which returns to menu).
+| Feeling        | When                         | How to get there                          |
+|----------------|------------------------------|-------------------------------------------|
+| **Disorientation** | Start of game / Level 1      | Short line: “You don’t remember. You only know: up.” |
+| **Determination**   | Early levels                 | “The Stack goes up. So do you.”           |
+| **Loneliness / awe**| Mid levels                   | Big vertical space, few words. “No one else made it this far.” |
+| **Hope**           | Nearing the top              | Brighter visuals, one line: “Almost there.” |
+| **Resolution**      | Reaching the Goal            | One clear beat: arrival, then a single line (see endings below). |
+
+You can hit these with 1–2 cutscene lines per level and palette changes (dark → bright). No need for long text or cutscenes early on.
 
 ---
 
-## Example cutscene text (copy-paste or adapt)
+## Story beats (expandable)
 
-- **Level 1**  
-  - “Jump left and right to climb. Reach the GOAL!”  
-  - “The Stack goes up. So do you.”  
+Use these as a **minimum** story spine. Add levels between any two rows, or new “chapters,” without breaking the premise.
 
-- **Level 2**  
-  - “The undercity never sleeps. Neither do you.”  
-  - “Keep climbing. The signal is stronger above.”  
+| Beat        | Level(s) | What happens                         | One example line                    |
+|-------------|----------|--------------------------------------|-------------------------------------|
+| **Awakening** | 1        | First climb. Learn to jump, reach first Goal. | “Jump left and right. Reach the GOAL.” |
+| **Deeper**    | 2        | Go further into the Stack. Darker, stranger.  | “The undercity doesn’t ask why. It just is.” |
+| **Mid**       | 3        | Middle of the tower. Scale sinks in.        | “You’re not the first to climb. Be the first to reach the top.” |
+| **Near**       | 4        | Close to the apex. Light changes.           | “The light above isn’t just glow. It’s the source.” |
+| **Peak**       | 5 (or last) | Reach the Goal. Story payoff.              | See “Endings” below.                |
 
-- **Level 3**  
-  - “You’re halfway to the apex. The data streams remember every climber.”  
-  - “Don’t look down.”  
+Later you can insert: “The Fallen” (level where you find traces of others), “The Glitch” (weird geometry / one-off mechanic), “The Voice” (first time something speaks to Moikopi), etc.
 
-- **Level 4**  
-  - “The light at the top isn’t just glow. It’s the source.”  
-  - “One more stretch.”  
+---
 
-- **Level 5 (final)**  
-  - “You reached the peak. Moikopi—the Stack sees you.”  
-  - (Optional second line:) “Stay, or jump. The choice is yours.”  
+## Endings (pick one or keep it open)
+
+Keep the **first** ending simple for early stage. The rest are options when you add more content.
+
+1. **Minimal (recommended for now)**  
+   Reach the Goal → one line: **“You reached the peak. The Stack holds its breath.”**  
+   Then menu or short loop. No choice, no twist—just arrival. You can add more later.
+
+2. **Mystery**  
+   **“You are Moikopi. The Stack chose you. What you do next is yours.”**  
+   Implies meaning without explaining it. Good if you want sequel or DLC hooks.
+
+3. **Choice**  
+   **“Stay and become part of the signal—or jump back down and live.”**  
+   Only add if you’re ready to implement two outcomes (e.g. different menu or “New Game+”).
+
+4. **Escape**  
+   **“The peak isn’t the end. It’s the way out.”**  
+   Suggests the world below was a trap; fits if you later add “outside” visuals or story.
+
+Start with (1); swap in another when the game grows.
+
+---
+
+## What to add later (without changing the premise)
+
+- **More levels** — New “zones” (e.g. The Core, The Spire, The Static) that reuse the same climb + Goal structure.
+- **Echoes / logs** — Text or voice lines that hint at who built the Stack or who climbed before. Optional.
+- **Another character** — A second creature, or a voice, that appears in one level. Doesn’t need to be in level 1.
+- **Twist** — e.g. “You’ve been here before” or “The peak is a new beginning.” Drop in when you add a new act.
+- **Endless tie-in** — Optional line in Endless: “The climb never ends. Maybe that’s the point.” Keeps both modes in the same world.
+
+---
+
+## Example cutscene lines (copy-paste or tweak)
+
+**Level 1**  
+- “Jump left and right to climb. Reach the GOAL!”  
+- “You don’t remember. You only know: up.”
+
+**Level 2**  
+- “The Stack goes up. So do you.”  
+- “The undercity never sleeps. Neither do you.”
+
+**Level 3**  
+- “You’re halfway. The data streams remember every climber.”  
+- “Don’t look down.”
+
+**Level 4**  
+- “The light at the top isn’t just glow. It’s the source.”  
+- “One more stretch.”
+
+**Level 5 (final)**  
+- “You reached the peak. The Stack holds its breath.”  
+- Or: “You are Moikopi. What you do next is yours.”
 
 ---
 
 ## Summary
 
-- **Story**: Moikopi climbs the Stack from bottom to apex to find out why they’re there; the peak is the resolution.  
-- **Character**: Redesign the frog as a neon, data-like climber (cyan/magenta, optional glow); keep the name Moikopi.  
-- **Environment**: Same neon grid base; vary palette and platform style per chapter (dark undercity → bright apex).  
-- **Levels**: Use the chapter table and cutscene examples above to build level_01 through level_05 (or more) and keep story and art aligned.
+- **Compelling hook:** Small creature, bottom of a vertical world, no memory—answer is at the top.
+- **One throughline:** Disorientation → determination → loneliness/awe → hope → resolution.
+- **Early-stage:** Use 3–5 levels and a minimal ending (“You reached the peak”); add levels and twists later.
+- **Expandable:** New zones, echoes, another character, or a twist can slot in without rewriting the core.
 
-You can implement character and environment changes gradually: e.g. first update level_01 cutscenes and platform colors to this storyline, then add new levels and finally swap the character sprite when the new art is ready.
+You can implement story gradually: cutscene text and palette per level first, then extra levels and character/environment art when ready.
+
+---
+
+## How the story is integrated in the game
+
+These are wired up so the storyline appears in play, not only in this doc.
+
+| Where | What |
+|-------|------|
+| **Story intro** | When you press **Story** on the menu, the game loads `scenes/story/story_intro.tscn` first. It shows the hook (“You woke at the bottom of the Stack…”) and “Tap or press any key to begin.” On key/tap, it loads the first level. |
+| **Chapter title** | Each story level root has exports: **Chapter Title**, **Chapter Subtitle**, **Goal Message**. If you set them in the inspector (or in the .tscn), the level shows the chapter at the top of the screen when it loads (fade in → hold → fade out). Example: “Awakening” + “You don’t remember. You only know: up.” |
+| **Cutscenes** | Use **CutsceneTrigger** instances and set **Cutscene Text** (and **Display Duration**, **Mode**: Ambient or Cinematic) to the lines from the “Example cutscene lines” table. Level 1 already has intro + ambient lines; add more per level. |
+| **Goal message** | When the player reaches the Goal, the UI toast shows **Goal Message** if set (e.g. “First goal. The Stack awaits.” or “You reached the peak. The Stack holds its breath.”). Set **Goal Message** on the level root. |
+| **Fail (story mode)** | If the player falls in Story mode, the fail panel title is “Fell. The Stack doesn’t forgive.” instead of “FELL!” |
+
+**Where to set story text**
+
+- **Intro screen:** `scenes/story/story_intro.tscn` — edit the HookLabel and ContinueLabel text in the scene.
+- **Per level:** Open the level scene (e.g. `level_01.tscn`), select the root node (Level01), and in the Inspector set **Chapter Title**, **Chapter Subtitle**, **Goal Message**. Add or edit **CutsceneTrigger** nodes for in-level lines.
