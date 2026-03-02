@@ -36,7 +36,7 @@ func _ready() -> void:
 	if _is_mobile:
 		restart_hint.text = "Left = jump left | Right = jump right"
 	else:
-		restart_hint.text = "A/D jump | R restart | Esc menu"
+		restart_hint.text = "A/D or LB/RB jump | R/Y restart | Esc/Start menu"
 
 
 func _on_goal_reached(time_str: String) -> void:
@@ -91,6 +91,10 @@ func _process(delta: float) -> void:
 		AudioManager.play_fall()
 		AudioManager.stop_bgm()
 		AudioManager.stop_rain()
+		# Gamepad: grab focus on Retry so controller can navigate
+		fail_btn_retry.grab_focus()
+		fail_btn_retry.focus_neighbor_right = fail_btn_menu.get_path()
+		fail_btn_menu.focus_neighbor_left = fail_btn_retry.get_path()
 
 
 func _input(_event: InputEvent) -> void:
@@ -98,6 +102,12 @@ func _input(_event: InputEvent) -> void:
 		GameManager.restart()
 	if Input.is_action_just_pressed("menu"):
 		GameManager.go_to_menu()
+	if Input.is_action_just_pressed("gamepad_accept") and fail_panel.visible:
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused == fail_btn_menu:
+			_on_menu()
+		else:
+			_on_restart()
 
 
 func _on_restart() -> void:
