@@ -23,13 +23,19 @@ func _ready() -> void:
 	if DisplayServer.is_touchscreen_available():
 		controls_label.text = "Tap = Endless | Left/Right = Jump"
 	else:
-		controls_label.text = "A/D = Jump | R = Restart | Esc = Menu"
+		controls_label.text = "A/D or LB/RB = Jump | R/Y = Restart | Esc/Start = Menu"
 
 	# Lifetime stats
 	_update_stats()
 
 	# Neon atmosphere on menu
 	_create_menu_neon_particles()
+
+	# Gamepad: give focus to the Endless button so D-pad/stick can navigate
+	btn_endless.grab_focus()
+	# Set focus neighbors so D-pad left/right moves between buttons
+	btn_endless.focus_neighbor_right = btn_story.get_path()
+	btn_story.focus_neighbor_left = btn_endless.get_path()
 
 
 func _update_stats() -> void:
@@ -58,6 +64,13 @@ func _unhandled_input(event: InputEvent) -> void:
 		_on_endless()
 	elif event.is_action_pressed("jump_left") or event.is_action_pressed("jump_right"):
 		_on_endless()
+	elif event.is_action_pressed("gamepad_accept"):
+		# A button confirms the focused button (Endless or Story)
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused == btn_story:
+			_on_story()
+		else:
+			_on_endless()
 
 
 func _on_endless() -> void:

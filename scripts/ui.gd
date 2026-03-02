@@ -8,6 +8,7 @@ extends CanvasLayer
 @onready var power_bar_fill: ColorRect = $PowerBarBg/PowerBarFill
 @onready var goal_toast: Label = $GoalToast
 @onready var fail_panel: PanelContainer = $FailPanel
+@onready var fail_title: Label = $FailPanel/VBox/FailTitle
 @onready var fail_height_label: Label = $FailPanel/VBox/FailHeightLabel
 @onready var btn_restart: Button = $BtnRestart
 @onready var btn_menu: Button = $BtnMenu
@@ -35,11 +36,15 @@ func _ready() -> void:
 	if _is_mobile:
 		restart_hint.text = "Left = jump left | Right = jump right"
 	else:
-		restart_hint.text = "A/D jump | R restart | Esc menu"
+		restart_hint.text = "A/D or LB/RB jump | R/Y restart | Esc/Start menu"
 
 
 func _on_goal_reached(time_str: String) -> void:
-	goal_toast.text = "GOAL!  %s" % time_str
+	if GameManager.story_goal_message != "":
+		goal_toast.text = GameManager.story_goal_message + "  " + time_str
+		GameManager.story_goal_message = ""
+	else:
+		goal_toast.text = "GOAL!  %s" % time_str
 	goal_toast.visible = true
 	goal_toast.modulate.a = 1.0
 	_toast_time_left = TOAST_DURATION
@@ -78,10 +83,18 @@ func _process(delta: float) -> void:
 	# Fail overlay
 	if GameManager.game_state == GameManager.GameState.FAILED and not fail_panel.visible:
 		fail_panel.visible = true
+		if GameManager.game_mode == GameManager.GameMode.STORY:
+			fail_title.text = "Fell. The Stack doesn't forgive."
+		else:
+			fail_title.text = "FELL!"
 		fail_height_label.text = "Reached: %dm" % int(GameManager.max_height)
 		AudioManager.play_fall()
 		AudioManager.stop_bgm()
 		AudioManager.stop_rain()
+		# Gamepad: grab focus on Retry so controller can navigate
+		fail_btn_retry.grab_focus()
+		fail_btn_retry.focus_neighbor_right = fail_btn_menu.get_path()
+		fail_btn_menu.focus_neighbor_left = fail_btn_retry.get_path()
 
 
 func _input(_event: InputEvent) -> void:
@@ -89,6 +102,12 @@ func _input(_event: InputEvent) -> void:
 		GameManager.restart()
 	if Input.is_action_just_pressed("menu"):
 		GameManager.go_to_menu()
+	if Input.is_action_just_pressed("gamepad_accept") and fail_panel.visible:
+		var focused := get_viewport().gui_get_focus_owner()
+		if focused == fail_btn_menu:
+			_on_menu()
+		else:
+			_on_restart()
 
 
 func _on_restart() -> void:

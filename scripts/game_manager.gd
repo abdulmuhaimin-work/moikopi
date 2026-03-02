@@ -5,6 +5,9 @@ signal goal_reached(time_str: String)
 enum GameMode { ENDLESS, STORY }
 enum GameState { NOT_STARTED, RUNNING, ENDLESS, FAILED }
 
+# When in Story mode, goal/fail UI can show story-flavored text (set by story level)
+var story_goal_message: String = ""
+
 var game_mode: GameMode = GameMode.ENDLESS
 var current_story_level_path: String = ""  # Set when entering story mode
 
@@ -37,6 +40,7 @@ const SAVE_PATH := "user://best_times.cfg"
 const GAME_SCENE := "res://main.tscn"
 const MENU_SCENE := "res://scenes/menu.tscn"
 const PLAYER_SCENE := "res://scenes/player.tscn"
+const STORY_INTRO_SCENE := "res://scenes/story/story_intro.tscn"
 const STORY_LEVELS := [
 	"res://scenes/story/level_01.tscn",
 	"res://scenes/story/level_02.tscn",
@@ -126,6 +130,7 @@ func go_to_menu() -> void:
 	game_state = GameState.NOT_STARTED
 	game_mode = GameMode.ENDLESS
 	current_story_level_path = ""
+	story_goal_message = ""
 	elapsed_time = 0.0
 	max_height = 0.0
 	charge_percent = 0.0
@@ -143,7 +148,10 @@ func start_story(level_index: int = 0) -> void:
 	if level_index < 0 or level_index >= STORY_LEVELS.size():
 		return
 	current_story_level_path = STORY_LEVELS[level_index]
-	get_tree().change_scene_to_file(current_story_level_path)
+	if level_index == 0:
+		get_tree().change_scene_to_file(STORY_INTRO_SCENE)
+	else:
+		get_tree().change_scene_to_file(current_story_level_path)
 
 
 func get_time_string(time: float = -1.0) -> String:

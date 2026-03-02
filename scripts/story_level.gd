@@ -11,6 +11,12 @@ extends Node2D
 @export var death_y: float = 250.0
 @export var level_index: int = 0
 @export var next_level_path: String = ""
+## Shown at top of screen when the level loads (e.g. "Chapter 1: Awakening"). Leave empty to skip.
+@export var chapter_title: String = ""
+## Optional second line under the chapter title. Leave empty to skip.
+@export var chapter_subtitle: String = ""
+## When the player reaches the goal, this message is shown (e.g. "You reached the peak."). Leave empty for default "GOAL! time".
+@export var goal_message: String = ""
 
 var _player: CharacterBody2D = null
 
@@ -43,6 +49,8 @@ func _ready() -> void:
 	_setup_goal()
 	_build_overlay()
 	_setup_cutscene_triggers()
+	if chapter_title != "" or chapter_subtitle != "":
+		call_deferred("_show_chapter_title")
 	AudioManager.play_bgm()
 
 
@@ -79,8 +87,9 @@ func _setup_goal() -> void:
 func _on_goal_entered(body: Node2D) -> void:
 	if not body.is_in_group("player"):
 		return
+	if goal_message != "":
+		GameManager.story_goal_message = goal_message
 	GameManager.goal_reached.emit(GameManager.get_time_string())
-	AudioManager.play_goal()
 	if next_level_path.is_empty():
 		await get_tree().create_timer(1.5).timeout
 		GameManager.go_to_menu()
@@ -102,6 +111,50 @@ func _on_cutscene_triggered(text: String, duration: float, mode: int) -> void:
 		_show_ambient(text, duration)
 	else:          # CINEMATIC
 		_show_cinematic(text, duration)
+
+
+# ---- Chapter title (on level load) ----
+
+func _show_chapter_title() -> void:
+	if _overlay_layer == null:
+		return
+	var box := VBoxContainer.new()
+	box.set_anchors_preset(Control.PRESET_TOP_WIDE)
+	box.anchor_left = 0.0
+	box.anchor_right = 1.0
+	box.anchor_top = 0.0
+	box.anchor_bottom = 0.0
+	box.offset_top = 24.0
+	box.offset_bottom = 70.0
+	box.add_theme_constant_override("separation", 4)
+	box.alignment = BoxContainer.ALIGNMENT_CENTER
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+
+	var title_label := Label.new()
+	title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title_label.add_theme_font_size_override("font_size", 10)
+	title_label.add_theme_color_override("font_color", Color(0.0, 0.95, 1.0, 1.0))
+	title_label.text = chapter_title
+	title_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	box.add_child(title_label)
+
+	if chapter_subtitle != "":
+		var sub_label := Label.new()
+		sub_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		sub_label.add_theme_font_size_override("font_size", 7)
+		sub_label.add_theme_color_override("font_color", Color(0.6, 0.8, 0.95, 1.0))
+		sub_label.text = chapter_subtitle
+		sub_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		box.add_child(sub_label)
+
+	box.modulate.a = 0.0
+	_overlay_layer.add_child(box)
+
+	var tween := create_tween()
+	tween.tween_property(box, "modulate:a", 1.0, 0.6).set_ease(Tween.EASE_OUT)
+	tween.tween_interval(2.2)
+	tween.tween_property(box, "modulate:a", 0.0, 0.5).set_ease(Tween.EASE_IN)
+	tween.tween_callback(box.queue_free)
 
 
 # ---- Overlay construction ----

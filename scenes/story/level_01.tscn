@@ -16,6 +16,9 @@ camera_limit_right = 340
 camera_limit_bottom = 220
 death_y = 230.0
 next_level_path = "res://scenes/story/level_02.tscn"
+chapter_title = "Awakening"
+chapter_subtitle = "You don't remember. You only know: up."
+goal_message = "First goal. The Stack awaits."
 
 [node name="Background" parent="." instance=ExtResource("2_bg")]
 
