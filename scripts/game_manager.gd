@@ -38,8 +38,10 @@ var stats := {
 
 const SAVE_PATH := "user://best_times.cfg"
 const GAME_SCENE := "res://main.tscn"
+const MAIN_3D_SCENE := "res://scenes/main_3d.tscn"
 const MENU_SCENE := "res://scenes/menu.tscn"
 const PLAYER_SCENE := "res://scenes/player.tscn"
+var current_main_scene: String = GAME_SCENE  # Used by restart() to reload 2D or 3D
 const STORY_INTRO_SCENE := "res://scenes/story/story_intro.tscn"
 const STORY_LEVELS := [
 	"res://scenes/story/level_01.tscn",
@@ -118,7 +120,7 @@ func restart() -> void:
 	if game_mode == GameMode.STORY and current_story_level_path != "":
 		get_tree().change_scene_to_file(current_story_level_path)
 	else:
-		get_tree().change_scene_to_file(GAME_SCENE)
+		get_tree().change_scene_to_file(current_main_scene)
 
 
 func go_to_menu() -> void:
@@ -140,7 +142,14 @@ func go_to_menu() -> void:
 
 func start_endless() -> void:
 	game_mode = GameMode.ENDLESS
+	current_main_scene = GAME_SCENE
 	get_tree().change_scene_to_file(GAME_SCENE)
+
+
+func start_endless_3d() -> void:
+	game_mode = GameMode.ENDLESS
+	current_main_scene = MAIN_3D_SCENE
+	get_tree().change_scene_to_file(MAIN_3D_SCENE)
 
 
 func start_story(level_index: int = 0) -> void:
