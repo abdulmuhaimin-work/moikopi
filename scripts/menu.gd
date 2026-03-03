@@ -6,11 +6,14 @@ extends Control
 @onready var stats_label: Label = $VBox/StatsLabel
 @onready var btn_endless: Button = $VBox/ModeButtons/BtnEndless
 @onready var btn_story: Button = $VBox/ModeButtons/BtnStory
+@onready var btn_endless_3d: Button = $VBox/ModeButtons/BtnEndless3D
 
 
 func _ready() -> void:
 	btn_endless.pressed.connect(_on_endless)
 	btn_story.pressed.connect(_on_story)
+	if btn_endless_3d != null:
+		btn_endless_3d.pressed.connect(_on_endless_3d)
 	# Records
 	var parts: Array[String] = []
 	if GameManager.best_height > 0.0:
@@ -34,8 +37,14 @@ func _ready() -> void:
 	# Gamepad: give focus to the Endless button so D-pad/stick can navigate
 	btn_endless.grab_focus()
 	# Set focus neighbors so D-pad left/right moves between buttons
-	btn_endless.focus_neighbor_right = btn_story.get_path()
-	btn_story.focus_neighbor_left = btn_endless.get_path()
+	if btn_endless_3d != null:
+		btn_endless.focus_neighbor_right = btn_endless_3d.get_path()
+		btn_endless_3d.focus_neighbor_left = btn_endless.get_path()
+		btn_endless_3d.focus_neighbor_right = btn_story.get_path()
+		btn_story.focus_neighbor_left = btn_endless_3d.get_path()
+	else:
+		btn_endless.focus_neighbor_right = btn_story.get_path()
+		btn_story.focus_neighbor_left = btn_endless.get_path()
 
 
 func _update_stats() -> void:
@@ -65,16 +74,21 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event.is_action_pressed("jump_left") or event.is_action_pressed("jump_right"):
 		_on_endless()
 	elif event.is_action_pressed("gamepad_accept"):
-		# A button confirms the focused button (Endless or Story)
 		var focused := get_viewport().gui_get_focus_owner()
 		if focused == btn_story:
 			_on_story()
+		elif btn_endless_3d != null and focused == btn_endless_3d:
+			_on_endless_3d()
 		else:
 			_on_endless()
 
 
 func _on_endless() -> void:
 	GameManager.start_endless()
+
+
+func _on_endless_3d() -> void:
+	GameManager.start_endless_3d()
 
 
 func _on_story() -> void:

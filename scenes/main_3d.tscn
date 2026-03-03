@@ -1,0 +1,32 @@
+[gd_scene format=3 uid="uid://main3d001"]
+
+[ext_resource type="PackedScene" path="res://scenes/level_3d.tscn" id="1_level"]
+[ext_resource type="PackedScene" path="res://scenes/player_3d.tscn" id="2_player"]
+[ext_resource type="PackedScene" path="res://scenes/ui.tscn" id="3_ui"]
+[ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="4_scanline"]
+
+[sub_resource type="Environment" id="Environment"]
+background_mode = 1
+background_color = Color(0.05, 0.02, 0.14, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.2, 0.15, 0.3, 1)
+ambient_light_energy = 0.7
+
+[node name="Main3D" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.7, -0.35, 0.62, 0, 0.87, 0.5, -0.71, -0.35, 0.61, 0, 20, 15)
+light_color = Color(0.7, 0.85, 1.0, 1)
+light_energy = 0.9
+
+[node name="Level3D" parent="." instance=ExtResource("1_level")]
+
+[node name="Player3D" parent="." instance=ExtResource("2_player")]
+position = Vector3(16, 1.9, 0)
+
+[node name="UI" parent="." instance=ExtResource("3_ui")]
+
+[node name="ScanlineOverlay" parent="." instance=ExtResource("4_scanline")]
