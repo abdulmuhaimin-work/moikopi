@@ -83,7 +83,9 @@ func _process(delta: float) -> void:
 	# Fail overlay
 	if GameManager.game_state == GameManager.GameState.FAILED and not fail_panel.visible:
 		fail_panel.visible = true
-		if GameManager.game_mode == GameManager.GameMode.STORY:
+		if GameManager.story_fail_message != "":
+			fail_title.text = GameManager.story_fail_message
+		elif GameManager.game_mode == GameManager.GameMode.STORY:
 			fail_title.text = "Fell. The Stack doesn't forgive."
 		else:
 			fail_title.text = "FELL!"

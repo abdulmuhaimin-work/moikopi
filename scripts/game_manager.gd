@@ -7,6 +7,7 @@ enum GameState { NOT_STARTED, RUNNING, ENDLESS, FAILED }
 
 # When in Story mode, goal/fail UI can show story-flavored text (set by story level)
 var story_goal_message: String = ""
+var story_fail_message: String = ""  # e.g. "Caught!" when killed by opponent
 
 var game_mode: GameMode = GameMode.ENDLESS
 var current_story_level_path: String = ""  # Set when entering story mode
@@ -101,10 +102,19 @@ func update_height(player_y: float) -> void:
 
 	# Check death (applies in both RUNNING and ENDLESS)
 	if (game_state == GameState.RUNNING or game_state == GameState.ENDLESS) and player_y > death_y:
-		game_state = GameState.FAILED
-		stats["total_falls"] += 1
+		trigger_death(false)
 		stats["total_height"] += max_height
 		save_data()
+
+
+func trigger_death(killed_by_enemy: bool = false) -> void:
+	if game_state != GameState.RUNNING and game_state != GameState.ENDLESS:
+		return
+	game_state = GameState.FAILED
+	stats["total_falls"] += 1
+	if killed_by_enemy:
+		story_fail_message = "Caught. The Stack doesn't forgive."
+	save_data()
 
 
 func restart() -> void:
@@ -113,6 +123,7 @@ func restart() -> void:
 		stats["total_height"] += max_height
 		save_data()
 	game_state = GameState.NOT_STARTED
+	story_fail_message = ""
 	elapsed_time = 0.0
 	max_height = 0.0
 	charge_percent = 0.0
@@ -133,6 +144,7 @@ func go_to_menu() -> void:
 	game_mode = GameMode.ENDLESS
 	current_story_level_path = ""
 	story_goal_message = ""
+	story_fail_message = ""
 	elapsed_time = 0.0
 	max_height = 0.0
 	charge_percent = 0.0
