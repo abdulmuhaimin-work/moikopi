@@ -8,14 +8,19 @@
 [ext_resource type="PackedScene" path="res://scenes/story/CutsceneTrigger.tscn" id="6_cutscene"]
 [ext_resource type="PackedScene" path="res://scenes/effects/scanline_overlay.tscn" id="7_scanline"]
 [ext_resource type="PackedScene" path="res://scenes/story/Opponent.tscn" id="8_opponent"]
+[ext_resource type="PackedScene" path="res://scenes/story/MovingPlatform.tscn" id="9_moving"]
+[ext_resource type="PackedScene" path="res://scenes/story/Hazard.tscn" id="10_hazard"]
+[ext_resource type="PackedScene" path="res://scenes/story/SecretArea.tscn" id="11_secret"]
+[ext_resource type="PackedScene" path="res://scenes/story/Terminal.tscn" id="12_terminal"]
+[ext_resource type="PackedScene" path="res://scenes/story/GlitchTrigger.tscn" id="13_glitch"]
 
 [node name="Level01" type="Node2D" unique_id=1726114282]
 script = ExtResource("1_story")
-camera_limit_left = -20
-camera_limit_top = -100
-camera_limit_right = 340
-camera_limit_bottom = 220
-death_y = 230.0
+camera_limit_left = -80
+camera_limit_top = -220
+camera_limit_right = 720
+camera_limit_bottom = 240
+death_y = 250.0
 next_level_path = "res://scenes/story/level_02.tscn"
 chapter_title = "Awakening"
 chapter_subtitle = "You don't remember. You only know: up."
@@ -26,50 +31,88 @@ goal_message = "First goal. The Stack awaits."
 [node name="Platforms" type="Node2D" parent="." unique_id=1174641671]
 
 [node name="Ground" parent="Platforms" unique_id=2081404801 instance=ExtResource("4_platform")]
-position = Vector2(160, 170)
-platform_width = 260.0
+position = Vector2(320, 170)
+platform_width = 560.0
 platform_height = 20.0
 platform_color = Color(0.12, 0.05, 0.25, 1)
 
 [node name="Right1" parent="Platforms" unique_id=899347877 instance=ExtResource("4_platform")]
-position = Vector2(250, 130)
+position = Vector2(240, 128)
+platform_width = 65.0
+platform_color = Color(0.2, 0.1, 0.4, 0.9)
+
+[node name="Right2" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(400, 128)
+platform_width = 70.0
+platform_color = Color(0.25, 0.12, 0.45, 0.9)
+
+[node name="MovingBridge" parent="Platforms" instance=ExtResource("9_moving")]
+position = Vector2(320, 98)
 platform_width = 60.0
+offset_b = Vector2(80, 0)
+move_speed = 35.0
+
+[node name="Right3" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(540, 128)
+platform_width = 65.0
+platform_color = Color(0.85, 0.15, 0.75, 0.9)
 
 [node name="Opponent" parent="." instance=ExtResource("8_opponent")]
-position = Vector2(250, 116)
+position = Vector2(540, 114)
+near_dialogue = "It sees you. Don't touch."
 
-[node name="Mid" parent="Platforms" unique_id=1363724820 instance=ExtResource("4_platform")]
-position = Vector2(305, 80)
+[node name="UpRight" parent="Platforms" unique_id=1363724820 instance=ExtResource("4_platform")]
+position = Vector2(540, 72)
 platform_width = 70.0
 platform_color = Color(0.85, 0.15, 0.75, 0.9)
 
-[node name="Left1" parent="Platforms" unique_id=1575406056 instance=ExtResource("4_platform")]
-position = Vector2(70, 55)
-platform_width = 65.0
+[node name="MidLeft" parent="Platforms" unique_id=1575406056 instance=ExtResource("4_platform")]
+position = Vector2(400, 28)
+platform_width = 75.0
 platform_color = Color(0, 0.65, 0.8, 0.9)
 
-[node name="Top" parent="Platforms" unique_id=1386102156 instance=ExtResource("4_platform")]
-position = Vector2(161, 31)
+[node name="Center" parent="Platforms" unique_id=1386102156 instance=ExtResource("4_platform")]
+position = Vector2(320, -18)
+platform_width = 90.0
 platform_color = Color(0.25, 0.15, 0.45, 0.95)
 
+[node name="Top" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(320, -64)
+platform_width = 100.0
+platform_color = Color(0.25, 0.15, 0.45, 0.95)
+
+[node name="HazardSpikes" parent="." instance=ExtResource("10_hazard")]
+position = Vector2(320, 195)
+
+[node name="SecretArea" parent="." instance=ExtResource("11_secret")]
+position = Vector2(600, 0)
+secret_message = "A fragment of the old code. It remembers nothing."
+
+[node name="Terminal" parent="." instance=ExtResource("12_terminal")]
+position = Vector2(400, -30)
+terminal_text = "SYSTEM: First climb registered. The Stack is watching."
+
+[node name="GlitchZone" parent="." instance=ExtResource("13_glitch")]
+position = Vector2(160, -50)
+
 [node name="PlayerStart" type="Marker2D" parent="." unique_id=1622737562]
-position = Vector2(80, 149)
+position = Vector2(120, 150)
 
 [node name="Goal" parent="." unique_id=902114933 instance=ExtResource("5_goal")]
-position = Vector2(160, -45)
+position = Vector2(320, -110)
 
 [node name="Intro" parent="." unique_id=874062643 instance=ExtResource("6_cutscene")]
-position = Vector2(130, 155)
+position = Vector2(200, 155)
 cutscene_text = "You opened your eyes at the bottom of something vast."
 mode = 1
 
 [node name="Ambient1" parent="." unique_id=1072479176 instance=ExtResource("6_cutscene")]
-position = Vector2(312, 64)
+position = Vector2(540, 58)
 cutscene_text = "Hold a direction to charge. Release to jump."
 display_duration = 4.0
 
 [node name="Ambient2" parent="." unique_id=2092978908 instance=ExtResource("6_cutscene")]
-position = Vector2(70, 42)
+position = Vector2(120, 12)
 cutscene_text = "The walls hum. Something above is pulling you upward."
 display_duration = 4.0
 

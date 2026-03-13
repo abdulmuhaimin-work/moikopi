@@ -10,11 +10,11 @@
 
 [node name="Level04" type="Node2D"]
 script = ExtResource("1_story")
-camera_limit_left = -20
-camera_limit_top = -560
-camera_limit_right = 340
-camera_limit_bottom = 220
-death_y = 230.0
+camera_limit_left = -80
+camera_limit_top = -620
+camera_limit_right = 720
+camera_limit_bottom = 240
+death_y = 250.0
 level_index = 3
 next_level_path = "res://scenes/story/level_05.tscn"
 
@@ -23,89 +23,95 @@ next_level_path = "res://scenes/story/level_05.tscn"
 [node name="Platforms" type="Node2D" parent="."]
 
 [node name="Ground" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(160, 170)
-platform_width = 200.0
+position = Vector2(320, 170)
+platform_width = 480.0
 platform_height = 16.0
 platform_color = Color(0.15, 0.1, 0.35, 1)
 
 [node name="Right1" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(235, 110)
-platform_width = 45.0
+position = Vector2(460, 108)
+platform_width = 50.0
 platform_height = 10.0
 platform_color = Color(0.3, 0.85, 0.95, 0.9)
 
 [node name="Left1" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(85, 48)
-platform_width = 45.0
+position = Vector2(120, 45)
+platform_width = 50.0
 platform_height = 10.0
 platform_color = Color(0.85, 0.7, 0.2, 0.9)
 
 [node name="Right2" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(248, -18)
-platform_width = 40.0
+position = Vector2(540, -22)
+platform_width = 45.0
 platform_height = 10.0
 platform_color = Color(0.3, 0.85, 0.95, 0.9)
 
 [node name="Left2" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(75, -85)
-platform_width = 40.0
+position = Vector2(100, -90)
+platform_width = 45.0
 platform_height = 10.0
 platform_color = Color(0.85, 0.7, 0.2, 0.9)
 
 [node name="RestPlatform" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(160, -150)
-platform_width = 140.0
+position = Vector2(320, -165)
+platform_width = 240.0
 platform_height = 10.0
 platform_color = Color(0.3, 0.2, 0.5, 0.95)
 
 [node name="Right3" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(245, -222)
-platform_width = 40.0
+position = Vector2(540, -242)
+platform_width = 45.0
 platform_height = 10.0
 platform_color = Color(0.3, 0.85, 0.95, 0.9)
 
 [node name="Left3" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(80, -292)
-platform_width = 40.0
+position = Vector2(100, -242)
+platform_width = 45.0
 platform_height = 10.0
 platform_color = Color(0.85, 0.7, 0.2, 0.9)
 
 [node name="Right4" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(240, -362)
-platform_width = 40.0
+position = Vector2(520, -318)
+platform_width = 45.0
 platform_height = 10.0
 platform_color = Color(0.3, 0.85, 0.95, 0.9)
 
+[node name="Left4" parent="Platforms" instance=ExtResource("4_platform")]
+position = Vector2(120, -318)
+platform_width = 45.0
+platform_height = 10.0
+platform_color = Color(0.85, 0.7, 0.2, 0.9)
+
 [node name="GoalPlatform" parent="Platforms" instance=ExtResource("4_platform")]
-position = Vector2(160, -432)
-platform_width = 100.0
+position = Vector2(320, -395)
+platform_width = 180.0
 platform_height = 12.0
 platform_color = Color(1, 0.85, 0.3, 1)
 
 [node name="PlayerStart" type="Marker2D" parent="."]
-position = Vector2(90, 152)
+position = Vector2(120, 152)
 
 [node name="Goal" parent="." instance=ExtResource("5_goal")]
-position = Vector2(160, -482)
+position = Vector2(320, -445)
 
 [node name="Ambient1" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(85, 36)
+position = Vector2(120, 33)
 cutscene_text = "The architecture is different here. Deliberate. Someone designed this to be found."
 display_duration = 5.0
 
 [node name="Cinematic1" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(160, -162)
+position = Vector2(320, -177)
 cutscene_text = "It knows you're coming. The path ahead is narrower, but the light at the end is not just glow. It's recognition."
 display_duration = 3.5
 mode = 1
 
 [node name="Ambient2" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(80, -304)
+position = Vector2(100, -254)
 cutscene_text = "Your reflection in the surfaces is wrong. It's smiling."
 display_duration = 4.0
 
 [node name="Ambient3" parent="." instance=ExtResource("6_cutscene")]
-position = Vector2(240, -374)
+position = Vector2(540, -330)
 cutscene_text = "Almost there. You can feel it in the static."
 display_duration = 3.0
 

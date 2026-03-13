@@ -1,0 +1,25 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/temporary_platform.gd" id="1_script"]
+
+[sub_resource type="RectangleShape2D" id="shape"]
+size = Vector2(70, 12)
+
+[node name="TemporaryPlatform" type="StaticBody2D"]
+script = ExtResource("1_script")
+platform_width = 70.0
+platform_height = 12.0
+platform_color = Color(0.6, 0.2, 0.9, 0.85)
+hold_duration = 1.5
+reset_delay = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("shape")
+position = Vector2(-35, -6)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -35.0
+offset_top = -6.0
+offset_right = 35.0
+offset_bottom = 6.0
+color = Color(0.6, 0.2, 0.9, 0.85)

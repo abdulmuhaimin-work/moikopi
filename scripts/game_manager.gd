@@ -12,6 +12,10 @@ var story_fail_message: String = ""  # e.g. "Caught!" when killed by opponent
 var game_mode: GameMode = GameMode.ENDLESS
 var current_story_level_path: String = ""  # Set when entering story mode
 
+# Story abilities (set by story level from level_index)
+var story_ability_double_jump: bool = false   # Level 2+
+var story_ability_air_dash: bool = false      # Level 4+
+
 var game_state: GameState = GameState.NOT_STARTED
 var elapsed_time: float = 0.0
 var start_y: float = 0.0

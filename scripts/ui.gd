@@ -17,8 +17,11 @@ extends CanvasLayer
 
 var _is_mobile := false
 var _toast_time_left: float = 0.0
+var _death_sequence_done: bool = false
+var _goal_flash_done: bool = false
 
 const TOAST_DURATION := 3.5  # seconds the goal toast stays visible
+const DEATH_DELAY := 0.55  # delay before showing fail panel
 
 
 func _ready() -> void:
@@ -36,10 +39,24 @@ func _ready() -> void:
 	if _is_mobile:
 		restart_hint.text = "Left = jump left | Right = jump right"
 	else:
-		restart_hint.text = "A/D or LB/RB jump | R/Y restart | Esc/Start menu"
+		restart_hint.text = "A/D jump | E echo | R restart | Esc menu"
 
 
 func _on_goal_reached(time_str: String) -> void:
+	_goal_flash_done = false
+	# Brief level-complete flash
+	var flash := ColorRect.new()
+	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	flash.anchor_left = 0.0
+	flash.anchor_right = 1.0
+	flash.anchor_top = 0.0
+	flash.anchor_bottom = 1.0
+	flash.color = Color(0.2, 0.8, 1.0, 0.35)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.4)
+	tw.tween_callback(flash.queue_free)
 	if GameManager.story_goal_message != "":
 		goal_toast.text = GameManager.story_goal_message + "  " + time_str
 		GameManager.story_goal_message = ""
@@ -80,23 +97,30 @@ func _process(delta: float) -> void:
 		if _toast_time_left <= 0.0:
 			goal_toast.visible = false
 
-	# Fail overlay
-	if GameManager.game_state == GameManager.GameState.FAILED and not fail_panel.visible:
-		fail_panel.visible = true
-		if GameManager.story_fail_message != "":
-			fail_title.text = GameManager.story_fail_message
-		elif GameManager.game_mode == GameManager.GameMode.STORY:
-			fail_title.text = "Fell. The Stack doesn't forgive."
-		else:
-			fail_title.text = "FELL!"
-		fail_height_label.text = "Reached: %dm" % int(GameManager.max_height)
+	# Fail overlay: brief glitch then show panel
+	if GameManager.game_state == GameManager.GameState.FAILED and not _death_sequence_done:
+		_death_sequence_done = true
 		AudioManager.play_fall()
 		AudioManager.stop_bgm()
 		AudioManager.stop_rain()
-		# Gamepad: grab focus on Retry so controller can navigate
-		fail_btn_retry.grab_focus()
-		fail_btn_retry.focus_neighbor_right = fail_btn_menu.get_path()
-		fail_btn_menu.focus_neighbor_left = fail_btn_retry.get_path()
+		var death_flash := ColorRect.new()
+		death_flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+		death_flash.anchor_left = 0.0
+		death_flash.anchor_right = 1.0
+		death_flash.anchor_top = 0.0
+		death_flash.anchor_bottom = 1.0
+		death_flash.color = Color(0.5, 0.05, 0.15, 0.6)
+		death_flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		add_child(death_flash)
+		var tw := create_tween()
+		tw.tween_interval(DEATH_DELAY)
+		tw.tween_property(death_flash, "color:a", 0.0, 0.25)
+		tw.tween_callback(death_flash.queue_free)
+		tw.tween_callback(_show_fail_panel)
+	if GameManager.game_state == GameManager.GameState.FAILED and fail_panel.visible:
+		pass  # already shown
+	elif GameManager.game_state != GameManager.GameState.FAILED:
+		_death_sequence_done = false
 
 
 func _input(_event: InputEvent) -> void:
@@ -110,6 +134,20 @@ func _input(_event: InputEvent) -> void:
 			_on_menu()
 		else:
 			_on_restart()
+
+
+func _show_fail_panel() -> void:
+	if GameManager.story_fail_message != "":
+		fail_title.text = GameManager.story_fail_message
+	elif GameManager.game_mode == GameManager.GameMode.STORY:
+		fail_title.text = "Fell. The Stack doesn't forgive."
+	else:
+		fail_title.text = "FELL!"
+	fail_height_label.text = "Reached: %dm" % int(GameManager.max_height)
+	fail_panel.visible = true
+	fail_btn_retry.grab_focus()
+	fail_btn_retry.focus_neighbor_right = fail_btn_menu.get_path()
+	fail_btn_menu.focus_neighbor_left = fail_btn_retry.get_path()
 
 
 func _on_restart() -> void:

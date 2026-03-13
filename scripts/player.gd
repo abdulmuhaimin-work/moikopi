@@ -10,18 +10,26 @@ const WALL_BOUNCE := 0.3
 const MIN_POWER := 200.0
 const MAX_POWER := 500.0
 const CHARGE_RATE := 200.0
+const DOUBLE_JUMP_POWER := 280.0
+const AIR_DASH_SPEED := 320.0
+const AIR_DASH_DURATION := 0.12
 # Oscillation ranges per direction (from horizontal)
-# Right: 45° (more sideways) to 85° (nearly vertical)
-# Left:  95° (nearly vertical) to 135° (more sideways)
 const ANGLE_RIGHT_MIN := deg_to_rad(35.0)
 const ANGLE_RIGHT_MAX := deg_to_rad(85.0)
 const ANGLE_LEFT_MIN := deg_to_rad(145.0)
 const ANGLE_LEFT_MAX := deg_to_rad(195.0)
 const ANGLE_SPEED := 3.5
 
+# Echo
+const ECHO_DURATION := 4.0
+
 # Visual
 const ARROW_MIN_LEN := 15.0
 const ARROW_MAX_LEN := 40.0
+
+# Juice
+const LAND_SHAKE_AMOUNT := 3.0
+const LAND_SHAKE_DURATION := 0.15
 
 var state: State = State.IDLE
 var charge_time: float = 0.0
@@ -32,16 +40,33 @@ var charging_dir: int = 0  # -1 = left, 1 = right
 # Input flags (set by _unhandled_input, consumed each physics frame)
 var _jump_dir: int = 0      # -1 left, 1 right, 0 none (press)
 var _jump_released := false
+var _echo_pressed := false
+var _dash_pressed := false
+
+# Abilities (per air time)
+var _double_jump_used := false
+var _dash_used_this_air := false
+var _dash_timer: float = 0.0
+
+# Echo
+var _echo_pos: Vector2 = Vector2.ZERO
+var _echo_time_left: float = 0.0
+var _echo_placed := false
+var _echo_marker: Node2D = null
 
 @onready var sprite: AnimatedSprite2D = $AnimatedSprite2D
 @onready var aim_arrow: Line2D = $AimArrow
 @onready var camera: Camera2D = $Camera2D
+var land_particles: CPUParticles2D = null
 
 
 func _ready() -> void:
 	add_to_group("player")
 	aim_arrow.visible = false
 	GameManager.start_y = global_position.y
+	land_particles = get_node_or_null("LandParticles")
+	if land_particles:
+		land_particles.emitting = false
 
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -64,11 +89,29 @@ func _unhandled_input(event: InputEvent) -> void:
 		_jump_dir = 1
 	elif event.is_action_released("jump_left") or event.is_action_released("jump_right"):
 		_jump_released = true
+	if event.is_action_pressed("echo"):
+		_echo_pressed = true
+	if event.is_action_pressed("air_dash"):
+		_dash_pressed = true
 
 
 func _physics_process(delta: float) -> void:
+	# Air dash override (brief no-gravity)
+	if _dash_timer > 0.0:
+		_dash_timer -= delta
+		move_and_slide()
+		return
+
 	if not is_on_floor():
 		velocity.y += GRAVITY * delta
+
+	# Echo countdown and recall
+	if _echo_placed:
+		_echo_time_left -= delta
+		if _echo_marker:
+			_echo_marker.modulate.a = (_echo_time_left / ECHO_DURATION) * 0.8 + 0.2
+		if _echo_time_left <= 0.0:
+			_do_echo_recall()
 
 	match state:
 		State.IDLE:
@@ -96,12 +139,17 @@ func _physics_process(delta: float) -> void:
 	if state == State.AIRBORNE and is_on_floor():
 		velocity = Vector2.ZERO
 		state = State.IDLE
+		_double_jump_used = false
+		_dash_used_this_air = false
 		AudioManager.play_land()
 		GameManager.update_height(global_position.y)
+		_do_land_juice()
 
 	# Clear input flags
 	_jump_dir = 0
 	_jump_released = false
+	_echo_pressed = false
+	_dash_pressed = false
 
 
 func _process_idle() -> void:
@@ -141,19 +189,13 @@ func _process_charging(delta: float) -> void:
 	var arrow_len := ARROW_MIN_LEN + power_ratio * (ARROW_MAX_LEN - ARROW_MIN_LEN)
 	var dir := Vector2(cos(current_angle), -sin(current_angle))
 	aim_arrow.points = PackedVector2Array([Vector2.ZERO, dir * arrow_len])
-	# Neon cyan (low power) to magenta (full power)
-	aim_arrow.default_color = Color(
-		power_ratio * 0.95,
-		0.15,
-		1.0,
-		0.95
-	)
+	aim_arrow.default_color = Color(power_ratio * 0.95, 0.15, 1.0, 0.95)
 
 	GameManager.is_charging = true
 	GameManager.charge_percent = power_ratio
 	sprite.play("default")
 
-	# Release to launch at current oscillating angle
+	# Release to launch
 	if _jump_released:
 		velocity.x = current_power * cos(current_angle)
 		velocity.y = -current_power * sin(current_angle)
@@ -167,5 +209,76 @@ func _process_charging(delta: float) -> void:
 
 
 func _process_airborne() -> void:
+	# Double jump (Story ability) — press direction again in air
+	if GameManager.story_ability_double_jump and not _double_jump_used and _jump_dir != 0:
+		var dj_dir: int = _jump_dir
+		velocity.x = DOUBLE_JUMP_POWER * 0.6 * (1.0 if dj_dir > 0 else -1.0)
+		velocity.y = -DOUBLE_JUMP_POWER * 0.75
+		_double_jump_used = true
+		GameManager.add_jump()
+		AudioManager.play_jump()
+		return
+
+	# Air dash (Story ability)
+	if GameManager.story_ability_air_dash and _dash_pressed and not _dash_used_this_air:
+		var dash_dir: int = 1 if velocity.x >= 0 else -1
+		if _jump_dir != 0:
+			dash_dir = _jump_dir
+		velocity.x = AIR_DASH_SPEED * dash_dir
+		velocity.y = 0.0
+		_dash_timer = AIR_DASH_DURATION
+		_dash_used_this_air = true
+		AudioManager.play_dash()
+		return
+
+	# Place echo
+	if _echo_pressed and not _echo_placed and GameManager.game_state == GameManager.GameState.RUNNING:
+		_echo_pos = global_position
+		_echo_placed = true
+		_echo_time_left = ECHO_DURATION
+		_spawn_echo_marker()
+		AudioManager.play_echo_place()
+		return
+
 	sprite.play("jump")
 	GameManager.update_height(global_position.y)
+
+
+func _spawn_echo_marker() -> void:
+	if _echo_marker:
+		_echo_marker.queue_free()
+	_echo_marker = Node2D.new()
+	_echo_marker.name = "EchoMarker"
+	_echo_marker.z_index = 10
+	_echo_marker.global_position = _echo_pos
+	get_parent().add_child(_echo_marker)
+	# Draw a simple ghost shape (circle via script)
+	var draw_node = Node2D.new()
+	draw_node.set_script(load("res://scripts/echo_marker_draw.gd"))
+	_echo_marker.add_child(draw_node)
+
+
+func _do_echo_recall() -> void:
+	global_position = _echo_pos
+	velocity = Vector2.ZERO
+	_echo_placed = false
+	_double_jump_used = false
+	_dash_used_this_air = false
+	if _echo_marker:
+		_echo_marker.queue_free()
+		_echo_marker = null
+	AudioManager.play_echo_recall()
+
+
+func _do_land_juice() -> void:
+	# Screen shake
+	if camera:
+		var tw := create_tween()
+		tw.tween_property(camera, "offset", Vector2(LAND_SHAKE_AMOUNT, 0), LAND_SHAKE_DURATION * 0.25).set_ease(Tween.EASE_OUT)
+		tw.tween_property(camera, "offset", Vector2(-LAND_SHAKE_AMOUNT * 0.8, 0), LAND_SHAKE_DURATION * 0.25)
+		tw.tween_property(camera, "offset", Vector2(LAND_SHAKE_AMOUNT * 0.4, 0), LAND_SHAKE_DURATION * 0.25)
+		tw.tween_property(camera, "offset", Vector2.ZERO, LAND_SHAKE_DURATION * 0.25)
+	# Particles
+	if land_particles:
+		land_particles.global_position = global_position
+		land_particles.emitting = true

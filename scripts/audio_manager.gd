@@ -88,6 +88,18 @@ func play_fall() -> void:
 	_play_sfx(_sfx_fall, -3.0)
 
 
+func play_dash() -> void:
+	_play_sfx(_sfx_jump, -8.0)
+
+
+func play_echo_place() -> void:
+	_play_sfx(_sfx_jump, -12.0)
+
+
+func play_echo_recall() -> void:
+	_play_sfx(_sfx_land, -6.0)
+
+
 func play_bgm() -> void:
 	if not _bgm.playing:
 		_bgm.stream = _bgm_stream

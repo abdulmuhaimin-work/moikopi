@@ -44,11 +44,18 @@ func _ready() -> void:
 	GameManager.max_height = 0.0
 	GameManager.death_y = death_y
 	GameManager.finish_y = -99999.0
+	GameManager.story_ability_double_jump = (level_index >= 1)
+	GameManager.story_ability_air_dash = (level_index >= 3)
 
 	_spawn_player()
 	_setup_goal()
 	_build_overlay()
 	_setup_cutscene_triggers()
+	_setup_zone_triggers()
+	_setup_secret_areas()
+	_setup_terminals()
+	_setup_glitch_triggers()
+	_setup_opponent_dialogue()
 	if chapter_title != "" or chapter_subtitle != "":
 		call_deferred("_show_chapter_title")
 	AudioManager.play_bgm()
@@ -111,6 +118,68 @@ func _on_cutscene_triggered(text: String, duration: float, mode: int) -> void:
 		_show_ambient(text, duration)
 	else:          # CINEMATIC
 		_show_cinematic(text, duration)
+
+
+func _setup_zone_triggers() -> void:
+	var bg := get_node_or_null("Background")
+	if bg == null or not bg.has_method("set_zone"):
+		return
+	for node in get_tree().get_nodes_in_group("zone_trigger"):
+		if node.has_signal("zone_entered"):
+			node.zone_entered.connect(bg.set_zone)
+
+
+func _setup_secret_areas() -> void:
+	for node in get_tree().get_nodes_in_group("secret_area"):
+		if node.has_signal("secret_found"):
+			node.secret_found.connect(_on_secret_found)
+
+
+func _on_secret_found(message: String) -> void:
+	_show_ambient(message, 4.0)
+
+
+func _setup_terminals() -> void:
+	for node in get_tree().get_nodes_in_group("terminal"):
+		if node.has_signal("terminal_read"):
+			node.terminal_read.connect(_on_terminal_read)
+
+
+func _on_terminal_read(text: String, duration: float) -> void:
+	_show_ambient(text, duration)
+
+
+func _setup_glitch_triggers() -> void:
+	for node in get_tree().get_nodes_in_group("glitch_trigger"):
+		if node.has_signal("glitch_triggered"):
+			node.glitch_triggered.connect(_do_glitch)
+
+
+func _do_glitch() -> void:
+	if _overlay_layer == null:
+		return
+	var flash := ColorRect.new()
+	flash.set_anchors_preset(Control.PRESET_FULL_RECT)
+	flash.anchor_left = 0.0
+	flash.anchor_right = 1.0
+	flash.anchor_top = 0.0
+	flash.anchor_bottom = 1.0
+	flash.color = Color(0.9, 0.3, 0.4, 0.4)
+	flash.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_overlay_layer.add_child(flash)
+	var tw := create_tween()
+	tw.tween_property(flash, "color:a", 0.0, 0.25)
+	tw.tween_callback(flash.queue_free)
+
+
+func _setup_opponent_dialogue() -> void:
+	for node in get_tree().get_nodes_in_group("opponent"):
+		if node.has_signal("near_dialogue_triggered"):
+			node.near_dialogue_triggered.connect(_on_opponent_near_dialogue)
+
+
+func _on_opponent_near_dialogue(text: String) -> void:
+	_show_ambient(text, 4.0)
 
 
 # ---- Chapter title (on level load) ----
